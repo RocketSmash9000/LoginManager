@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LoginManager</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .button-container { margin-top: 10px; }
+        button { 
+            padding: 8px 16px; 
+            margin-right: 10px; 
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        input[type="text"] {
+            padding: 8px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<h2>LoginManager</h2>
+<form id="loginForm">
+    <label for="dni">Usuario (DNI):</label><br>
+    <input type="text" id="dni" name="dni" required><br><br>
+    <div class="button-container">
+        <button type="button" onclick="submitForm('entrada')">Registrar Entrada</button>
+        <button type="button" onclick="submitForm('salida')">Registrar Salida</button>
+    </div>
+</form>
+<script>
+    function submitForm(action) {
+        const dni = document.getElementById('dni').value;
+        if (!dni) {
+            alert('Por favor, introduce un DNI');
+            return;
+        }
+
+        fetch('/' + action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'dni=' + encodeURIComponent(dni)
+        })
+        .then(response => response.text())
+        .then(data => {
+            alert(data);
+            document.getElementById('dni').value = '';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ocurrió un error al procesar la solicitud');
+        });
+    }
+</script>
+</body>
+</html>
