@@ -4,8 +4,6 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-// jdbc:mysql://localhost:3306/
-
 public class Conexión {
 	public static int creaDB() {
 		try {

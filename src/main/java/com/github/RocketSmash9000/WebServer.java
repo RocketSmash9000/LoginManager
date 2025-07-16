@@ -24,7 +24,7 @@ public class WebServer {
         }
 
         // Configure Spark
-        port(4567);
+        port(2048);
         staticFiles.location("/public"); // Serve static files from resources/public
 
         // Enable CORS
