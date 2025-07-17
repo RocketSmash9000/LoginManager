@@ -9,7 +9,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
+import static java.lang.System.exit;
+
 public class StartupManager {
+    private static final String MYSQL_SERVICE_NAME = "MySQL"; // Default MySQL service name, change if different
 	// The name of your application's folder.
 	private static final String folderName = "LoginManager";
 
@@ -38,6 +41,9 @@ public class StartupManager {
 		else return false;
 	}
 	public static void firstStartup() {
+		if (!mySQLStartup())
+			exit(1);
+
 		System.out.println("Hola! Si estás viendo esto es porque esta es la primera vez que inicias el programa.");
 		System.out.println("De ser así, vamos a tener que pedirte las crecenciales para poder acceder a mySQL.");
 		System.out.println("De esta forma, podremos crear y administrar la base de datos de LoginManager.");
@@ -99,6 +105,8 @@ public class StartupManager {
 	} // The Scanner is automatically closed here by the try-with-resources statement
 
 	public static void startup() {
+		if (!mySQLStartup())
+			exit(1);
 		if (credFileExists()) {
 			String appDataPath = System.getenv("APPDATA");
 
@@ -123,5 +131,58 @@ public class StartupManager {
 			Logger.log("Se han leído las credenciales con éxito.");
 		}
 	}
+
+	/**
+	 * Checks if the MySQL service is running and starts it if it's not.
+     * This method requires administrator privileges to start the service.
+     * @return true if the service is running or was successfully started, false otherwise
+     */
+    public static boolean mySQLStartup() {
+        try {
+            // Check if the service is already running
+            Process checkProcess = Runtime.getRuntime().exec("sc query " + MYSQL_SERVICE_NAME);
+            checkProcess.waitFor();
+            
+            // Read the output to check service status
+            String output = new String(checkProcess.getInputStream().readAllBytes());
+            
+            if (output.contains("RUNNING")) {
+                Logger.log("MySQL ya está funcionando.");
+                return true;
+            } else if (output.contains("STOPPED")) {
+                Logger.log("MySQL está parado. Vamos a intentar iniciarlo...");
+                
+                // Try to start the service
+                Process startProcess = Runtime.getRuntime().exec("net start " + MYSQL_SERVICE_NAME);
+                int exitCode = startProcess.waitFor();
+                
+                if (exitCode == 0) {
+                    Logger.log("MySQL se pudo ejecutar exitosamente.");
+                    return true;
+                } else {
+                    String error = new String(startProcess.getErrorStream().readAllBytes());
+                    Logger.log("No se pudo iniciar MySQL. Código de salida: " + exitCode);
+                    Logger.log("Error: " + error);
+					Logger.log("Por favor, inicia MySQL manualmente o contacta con el autor.");
+                    return false;
+                }
+            } else if (output.contains("FAILED 1060")) {
+                Logger.log("MySQL no está instalado o el nombre del servicio es incorrecto.");
+	            Logger.log("Por favor, inicia MySQL manualmente si está instalado o contacta con el autor.");
+                return false;
+            } else {
+                Logger.log("Ha ocurrido un problema inesperado: " + output);
+	            Logger.log("Contacta con el autor para resolver el problema.");
+                return false;
+            }
+        } catch (IOException | InterruptedException e) {
+            Logger.log("Hubo un error al comprobar el mensaje de retorno: " + e.getMessage());
+	        Logger.log("Por favor, contacta con el autor.");
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            return false;
+        }
+    }
 }
 

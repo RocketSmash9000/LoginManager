@@ -3,39 +3,67 @@
 <head>
     <title>LoginManager</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .button-container { margin-top: 10px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .button-container { 
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
         button { 
-            padding: 8px 16px; 
-            margin-right: 10px; 
+            padding: 10px 20px; 
             cursor: pointer;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 4px;
+            transition: all 0.3s ease;
         }
         button:hover {
             opacity: 0.9;
+            transform: translateY(-1px);
         }
         input[type="text"] {
-            padding: 8px;
-            margin: 8px 0;
+            padding: 10px;
+            margin: 10px 0;
             border: 1px solid #ddd;
             border-radius: 4px;
+            width: 80%;
+            max-width: 300px;
         }
     </style>
     <link rel="icon" href="LoginManager.png" sizes="32x32" type="image/png">
 </head>
 <body>
-<h2>LoginManager</h2>
-<form id="loginForm">
-    <label for="dni">Usuario (DNI):</label><br>
-    <input type="text" id="dni" name="dni" required><br><br>
-    <div class="button-container">
-        <button type="button" onclick="submitForm('entrada')">Registrar Entrada</button>
-        <button type="button" onclick="submitForm('salida')">Registrar Salida</button>
-    </div>
-</form>
+<div class="container">
+    <h2>LoginManager</h2>
+    <form id="loginForm">
+        <label for="dni">Usuario (DNI):</label><br>
+        <input type="text" id="dni" name="dni" required><br>
+        <div class="button-container">
+            <button type="button" onclick="submitForm('entrada')">Registrar Entrada</button>
+            <button type="button" onclick="submitForm('salida')">Registrar Salida</button>
+        </div>
+    </form>
+</div>
 <script>
     function submitForm(action) {
         const dni = document.getElementById('dni').value;

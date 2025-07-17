@@ -8,7 +8,7 @@ public class Logger {
 		LocalDate fecha = LocalDate.now();       // Fecha actual
 		LocalTime hora = LocalTime.now();
 
-		String output = " [" + fecha + " - " + hora + "] >>> " + string;
+		String output = "-> [" + fecha + " - " + hora + "] : " + string;
 		System.out.println(output);
 	}
 }

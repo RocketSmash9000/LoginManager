@@ -6,6 +6,12 @@ public class WebServer {
     static boolean credFileExists;
     @SuppressWarnings("t")
     public static void main(String[] args) {
+        System.out.println();
+        System.out.println("            LoginManager");
+        System.out.println("Un programa creado por RocketSmash9000");
+        System.out.println();
+        System.out.println();
+
         credFileExists = StartupManager.credFileExists();
         if (!credFileExists) {
             StartupManager.firstStartup();
