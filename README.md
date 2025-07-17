@@ -10,7 +10,8 @@ LoginManager utiliza una interfaz web, de forma que solo hay que conectarse a la
 Simplemente, hay que insertar el DNI y pulsar en el botón correspondiente según si el trabajador está entrando o saliendo. Esto creará un registro en la base de datos al instante.
 
 ## Dependencias
-LoginManager necesita que los siguientes programas estén instalados:
+LoginManager necesita lo siguiente para poder funcionar adecuadamente:
+- Windows
 - Java 21 (preferiblemente de Eclipse Adoptium)
 - MySQL
 
