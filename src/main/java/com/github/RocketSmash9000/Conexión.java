@@ -11,13 +11,23 @@ public class Conexión {
 			Connection co= DriverManager.getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
 			Statement stm = co.createStatement();
 			Logger.log("Puede que nos hayamos conectado a la base de datos");
-			String sql = "CREATE TABLE RegistroHorario (" + // Crea una tabla con lo siguiente...
+			String sql = "CREATE TABLE IF NOT EXISTS RegistroHorario (" + // Crea una tabla con lo siguiente...
 					"id INT AUTO_INCREMENT PRIMARY KEY, " + // Una columna que va incrementando según se vayan insertando las cosas.
 					"dni VARCHAR(20) NOT NULL, " + // Una columna con el DNI del trabajador
 					"fecha DATE NOT NULL, " + // La fecha del día actual
 					"hora_entrada TIME, " + //La hora a la que entró
-					"hora_salida TIME)"; // La hora a la que salió
+					"hora_salida TIME, " + // La hora a la que salió
+					"observaciones VARCHAR(255))"; // Notas del trabajador
 			stm.executeUpdate(sql);
+
+			stm = co.createStatement();
+			sql = "CREATE TABLE IF NOT EXISTS Empleados (" +
+					"dni VARCHAR(9) PRIMARY KEY, " +
+					"nombre VARCHAR(100) NOT NULL, " +
+					"activo BOOLEAN NOT NULL DEFAULT TRUE)";
+			stm.executeUpdate(sql);
+
+
 			Logger.log("Pues nos hemos conectado.");
 			return 0;
 
@@ -27,6 +37,7 @@ public class Conexión {
 
 		} catch (SQLSyntaxErrorException e) {
 			Logger.log("Es altamente probable que la tabla ya exista, así que vamos directos al final.");
+			Logger.log(e.toString());
 			return 0;
 
 		} catch (SQLException e) {
@@ -60,48 +71,50 @@ public class Conexión {
 		}
 	}
 
-	public static int insertarEntrada(String dni) {
+	public static int insertarEntrada(String dni, String observaciones) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			Connection co= DriverManager.getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
-			String sql = "INSERT INTO RegistroHorario (dni, fecha, hora_entrada) VALUES (?, ?, ?)";
+			String sql = "INSERT INTO RegistroHorario (dni, fecha, hora_entrada, observaciones) VALUES (?, ?, ?, ?)";
 			try (PreparedStatement pstmt = co.prepareStatement(sql)) {
 				LocalDate fecha = LocalDate.now();       // Fecha actual
 				LocalTime horaEntrada = LocalTime.now(); // Hora actual
 
 				pstmt.setString(1, dni);
-				pstmt.setDate(2, Date.valueOf(fecha));             // java.sql.Date
-				pstmt.setTime(3, Time.valueOf(horaEntrada));       // java.sql.Time
+				pstmt.setDate(2, Date.valueOf(fecha));
+				pstmt.setTime(3, Time.valueOf(horaEntrada));
+				pstmt.setString(4, observaciones);
 
 				pstmt.executeUpdate();
 			}
 
 		} catch (ClassNotFoundException | SQLException e) {
-			Logger.log("Ha ocurrido un problema al insertar la entrada.");
+			Logger.log("Ha ocurrido un problema al insertar la entrada: " + e.getMessage());
 			return 1;
 		}
 		Logger.log("La entrada de la persona con DNI " + dni + " ha sido registrada.");
 		return 0; // Devuelve 0 si no ha habido ningún error
 	}
 
-	public static int insertarSalida(String dni) {
+	public static int insertarSalida(String dni, String observaciones) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			Connection co= DriverManager.getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
-			String sql = "INSERT INTO RegistroHorario (dni, fecha, hora_salida) VALUES (?, ?, ?)";
+			String sql = "INSERT INTO RegistroHorario (dni, fecha, hora_salida, observaciones) VALUES (?, ?, ?, ?)";
 			try (PreparedStatement pstmt = co.prepareStatement(sql)) {
 				LocalDate fecha = LocalDate.now();       // Fecha actual
 				LocalTime horaSalida = LocalTime.now(); // Hora actual
 
 				pstmt.setString(1, dni);
-				pstmt.setDate(2, Date.valueOf(fecha));             // java.sql.Date
-				pstmt.setTime(3, Time.valueOf(horaSalida));       // java.sql.Time
+				pstmt.setDate(2, Date.valueOf(fecha));
+				pstmt.setTime(3, Time.valueOf(horaSalida));
+				pstmt.setString(4, observaciones);
 
 				pstmt.executeUpdate();
 			}
 
 		} catch (ClassNotFoundException | SQLException e) {
-			Logger.log("Ha ocurrido un problema al insertar la salida.");
+			Logger.log("Ha ocurrido un problema al insertar la salida: " + e.getMessage());
 			return 1;
 		}
 		Logger.log("La salida de la persona con DNI " + dni + " ha sido registrada.");

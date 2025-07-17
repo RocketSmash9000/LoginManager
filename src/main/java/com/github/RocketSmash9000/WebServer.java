@@ -55,6 +55,7 @@ public class WebServer {
         // Handle form submission for "entrada"
         post("/entrada", (req, res) -> {
             String dni = req.queryParams("dni");
+            String observaciones = req.queryParams("observaciones");
             if (dni == null || dni.trim().isEmpty()) {
                 res.status(400);
                 return "Error: DNI no puede estar vacío";
@@ -63,7 +64,7 @@ public class WebServer {
                 return "Error: DNI no es válido";
             }
             
-            int result = Conexión.insertarEntrada(dni.trim());
+            int result = Conexión.insertarEntrada(dni.trim(), observaciones != null ? observaciones.trim() : null);
             if (result == 0) {
                 return "Entrada registrada correctamente para DNI: " + dni;
             } else {
@@ -75,6 +76,7 @@ public class WebServer {
         // Handle form submission for "salida"
         post("/salida", (req, res) -> {
             String dni = req.queryParams("dni");
+            String observaciones = req.queryParams("observaciones");
             if (dni == null || dni.trim().isEmpty()) {
                 res.status(400);
                 return "Error: DNI no puede estar vacío";
@@ -83,7 +85,7 @@ public class WebServer {
                 return "Error: DNI no es válido";
             }
 
-            int result = Conexión.insertarSalida(dni.trim());
+            int result = Conexión.insertarSalida(dni.trim(), observaciones != null ? observaciones.trim() : null);
             if (result == 0) {
                 return "Salida registrada correctamente para DNI: " + dni;
             } else {
@@ -99,4 +101,3 @@ public class WebServer {
         });
     }
 }
-
