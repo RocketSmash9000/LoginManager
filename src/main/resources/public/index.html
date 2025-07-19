@@ -107,6 +107,7 @@
             transform: translateY(0);
         }
         input[type="text"],
+        input[type="password"],
         textarea {
             width: 100%;
             padding: 0.8rem 1rem;
@@ -116,9 +117,11 @@
             font-size: 1rem;
             transition: var(--transition);
             background-color: var(--light-gray);
+            color: #333333;  /* Darker text color for better visibility */
         }
         
         input[type="text"]:focus,
+        input[type="password"]:focus,
         textarea:focus {
             outline: none;
             border-color: var(--primary-color);
@@ -127,6 +130,7 @@
         }
         
         input[type="text"]::placeholder,
+        input[type="password"]::placeholder,
         textarea::placeholder {
             color: #adb5bd;
             opacity: 1;
@@ -155,7 +159,31 @@
                 required>
             <div class="hint">Formato: 8 números + 1 letra</div>
         </div>
-        
+
+        <!-- Add this new form group after the DNI input -->
+        <div class="form-group" id="passwordGroup" style="display: none;">
+            <label for="password">Contraseña</label>
+            <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Introduce tu contraseña"
+                    minlength="6"
+                    required>
+            <div class="hint">Mínimo 6 caracteres</div>
+        </div>
+
+        <div class="form-group" id="confirmPasswordGroup" style="display: none;">
+            <label for="confirmPassword">Confirmar Contraseña</label>
+            <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    placeholder="Confirma tu contraseña"
+                    disabled>
+            <div class="hint" id="passwordMatchHint"></div>
+        </div>
+
         <div class="form-group">
             <label for="observaciones">Observaciones (opcional)</label>
             <textarea 
@@ -214,6 +242,135 @@
             console.error('Error:', error);
             alert('Ocurrió un error al procesar la solicitud');
         });
+    }
+
+    let isNewUser = false;
+
+    // Check if user exists when DNI loses focus
+    document.getElementById('dni').addEventListener('blur', async function() {
+        const dni = this.value.trim();
+        if (!dni) return;
+
+        try {
+            const response = await fetch('/check-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `dni=${encodeURIComponent(dni)}`
+            });
+
+            const data = await response.json();
+            isNewUser = data.isNewUser;
+
+            // Show/hide password fields based on user status
+            const passwordGroup = document.getElementById('passwordGroup');
+            const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+
+            if (isNewUser) {
+                passwordGroup.style.display = 'block';
+                confirmPasswordGroup.style.display = 'block';
+                passwordInput.required = true;
+            } else {
+                passwordGroup.style.display = 'block';
+                confirmPasswordGroup.style.display = 'none';
+                passwordInput.required = true;
+                confirmPasswordInput.required = false;
+            }
+        } catch (error) {
+            console.error('Error checking user:', error);
+        }
+    });
+
+    // Password confirmation validation
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const passwordMatchHint = document.getElementById('passwordMatchHint');
+
+    if (passwordInput && confirmPasswordInput) {
+        passwordInput.addEventListener('input', validatePassword);
+        confirmPasswordInput.addEventListener('input', validatePassword);
+    }
+
+    function validatePassword() {
+        if (!isNewUser) return true;
+
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (password.length < 6) {
+            passwordMatchHint.textContent = 'La contraseña debe tener al menos 6 caracteres';
+            passwordMatchHint.style.color = 'var(--danger-color)';
+            confirmPasswordInput.disabled = true;
+            return false;
+        }
+
+        confirmPasswordInput.disabled = false;
+
+        if (password && confirmPassword) {
+            if (password === confirmPassword) {
+                passwordMatchHint.textContent = 'Las contraseñas coinciden';
+                passwordMatchHint.style.color = 'var(--success-color)';
+                return true;
+            } else {
+                passwordMatchHint.textContent = 'Las contraseñas no coinciden';
+                passwordMatchHint.style.color = 'var(--danger-color)';
+                return false;
+            }
+        }
+        return false;
+    }
+
+    // Update submitForm function to include password
+    async function submitForm(action) {
+        const dni = document.getElementById('dni').value;
+        const password = document.getElementById('password')?.value;
+        const observaciones = document.getElementById('observaciones').value;
+
+        if (!dni) {
+            alert('Por favor, introduce un DNI');
+            return;
+        }
+
+        if (isNewUser && (!password || !validatePassword())) {
+            alert('Por favor, completa correctamente los campos de contraseña');
+            return;
+        }
+
+        const formData = new URLSearchParams();
+        formData.append('dni', dni);
+        if (password) formData.append('password', password);
+        if (observaciones) formData.append('observaciones', observaciones);
+
+        try {
+            const response = await fetch('/' + action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                const result = await response.text();
+                alert(result);
+                if (isNewUser) {
+                    // Reset form after successful registration
+                    document.getElementById('loginForm').reset();
+                    document.getElementById('passwordGroup').style.display = 'none';
+                    document.getElementById('confirmPasswordGroup').style.display = 'none';
+                    isNewUser = false;
+                }
+            } else {
+                const error = await response.text();
+                alert('Error: ' + error);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al procesar la solicitud');
+        }
     }
 </script>
 </body>

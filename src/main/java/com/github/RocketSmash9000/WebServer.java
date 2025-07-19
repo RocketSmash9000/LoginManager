@@ -55,13 +55,34 @@ public class WebServer {
         // Handle form submission for "entrada"
         post("/entrada", (req, res) -> {
             String dni = req.queryParams("dni");
+            String password = req.queryParams("password");
             String observaciones = req.queryParams("observaciones");
+
             if (dni == null || dni.trim().isEmpty()) {
                 res.status(400);
                 return "Error: DNI no puede estar vacío";
             } else if (!Checker.validDNI(dni)) {
                 res.status(400);
                 return "Error: DNI no es válido";
+            }
+
+            // Check if this is a new user registration
+            if (password != null && !password.isEmpty()) {
+                // Check if user already exists
+                int userStatus = Login.validarUsuario(dni, password);
+                switch (userStatus) {
+                    case 1:
+                        res.status(400);
+                        return "La contraseña es incorrecta.";
+                    case 2:
+                        if (!Login.añadirUsuario(dni, password)) {
+                            res.status(500);
+                            return "Error al registrar el nuevo usuario";
+                        }
+                    case 3:
+                        res.status(500);
+                        return "No se pudieron leer las credenciales";
+                }
             }
             
             int result = Conexión.insertarEntrada(dni.trim(), observaciones != null ? observaciones.trim() : null);
@@ -72,17 +93,38 @@ public class WebServer {
                 return "Error al registrar la entrada";
             }
         });
-
+        
         // Handle form submission for "salida"
         post("/salida", (req, res) -> {
             String dni = req.queryParams("dni");
+            String password = req.queryParams("password");
             String observaciones = req.queryParams("observaciones");
+
             if (dni == null || dni.trim().isEmpty()) {
                 res.status(400);
                 return "Error: DNI no puede estar vacío";
             } else if (!Checker.validDNI(dni)) {
                 res.status(400);
                 return "Error: DNI no es válido";
+            }
+
+            // Check if this is a new user registration
+            if (password != null && !password.isEmpty()) {
+                // Check if user already exists
+                int userStatus = Login.validarUsuario(dni, password);
+                switch (userStatus) {
+                    case 1:
+                        res.status(400);
+                        return "La contraseña es incorrecta.";
+                    case 2:
+                        if (!Login.añadirUsuario(dni, password)) {
+                            res.status(500);
+                            return "Error al registrar el nuevo usuario";
+                        }
+                    case 3:
+                        res.status(500);
+                        return "No se pudieron leer las credenciales";
+                }
             }
 
             int result = Conexión.insertarSalida(dni.trim(), observaciones != null ? observaciones.trim() : null);
@@ -94,10 +136,19 @@ public class WebServer {
             }
         });
 
-        // Root route - serve the index page
-        get("/", (req, res) -> {
-            res.redirect("/index.html");
-            return null;
+        // Endpoint to check if the user is valid and all that
+        post("/check-user", (req, res) -> {
+            String dni = req.queryParams("dni");
+            if (dni == null || dni.trim().isEmpty()) {
+                res.status(400);
+                return "{\"error\":\"DNI requerido\"}";
+            }
+
+            // Check if user exists using your existing Login.validarUsuario method
+            int userStatus = Login.validarUsuario(dni, "dummy_password");
+            boolean isNewUser = (userStatus == 2); // 2 means user doesn't exist
+
+            return "{\"isNewUser\":" + isNewUser + "}";
         });
     }
 }

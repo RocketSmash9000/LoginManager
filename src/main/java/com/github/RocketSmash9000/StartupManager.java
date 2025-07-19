@@ -14,10 +14,10 @@ import static java.lang.System.exit;
 public class StartupManager {
     private static final String MYSQL_SERVICE_NAME = "MySQL"; // Default MySQL service name, change if different
 	// The name of your application's folder.
-	private static final String folderName = "LoginManager";
+	public static final String FOLDER_NAME = "LoginManager";
 
 	// The name of the file you want to create.
-	private static final String fileName = "Credentials.txt";
+	public static final String FILE_NAME = "Credentials.txt";
 
 	public static String username;
 	public static String pass;
@@ -33,8 +33,8 @@ public class StartupManager {
 			return false;
 		}
 
-		File folder = new File(appDataPath, folderName);
-		File file = new File(folder, fileName);
+		File folder = new File(appDataPath, FOLDER_NAME);
+		File file = new File(folder, FILE_NAME);
 
 		if (file.exists())
 			return true;
@@ -70,7 +70,7 @@ public class StartupManager {
 			}
 
 			// 2. Create a File object for your application's subfolder.
-			File appFolder = new File(appDataPath, folderName);
+			File appFolder = new File(appDataPath, FOLDER_NAME);
 
 			// 3. Create the directory if it does not exist.
 			// use mkdirs() to create parent directories if they don't exist.
@@ -86,7 +86,7 @@ public class StartupManager {
 
 			// 4. Construct the full path to the file inside your application's folder.
 			// This will create a path like: C:\Users\{username}\AppData\Roaming\MyApplication\MyTextFile.txt
-			File file = new File(appFolder, fileName);
+			File file = new File(appFolder, FILE_NAME);
 
 			// 5. Create the file and write content to it.
 			// We use a BufferedWriter for efficient writing.
@@ -96,6 +96,8 @@ public class StartupManager {
 			}
 
 			Logger.log("Se ha escrito en el archivo: " + file.getAbsolutePath());
+
+			Cryptography.firstEncrypt(file);
 
 		} catch (IOException e) {
 			// Handle potential input/output errors (e.g., permission denied).
@@ -116,11 +118,14 @@ public class StartupManager {
 				return;
 			}
 
-			File folder = new File(appDataPath, folderName);
-			File filePath = new File(folder, fileName);
+			File folder = new File(appDataPath, FOLDER_NAME);
+			File filePath = new File(folder, FILE_NAME);
+
+			Cryptography.decrypt(filePath);
 
 			Path path = Paths.get(filePath.toString());
 			try (var reader = Files.newBufferedReader(path)) {
+				reader.readLine();
 				username = reader.readLine();
 				pass = reader.readLine();
 
@@ -129,6 +134,8 @@ public class StartupManager {
 				return;
 			}
 			Logger.log("Se han leído las credenciales con éxito.");
+
+			Cryptography.encrypt(filePath);
 		}
 	}
 

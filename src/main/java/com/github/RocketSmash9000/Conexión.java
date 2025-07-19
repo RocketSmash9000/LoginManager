@@ -4,11 +4,13 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import static java.sql.DriverManager.getConnection;
+
 public class Conexión {
 	public static int creaDB() {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection co= DriverManager.getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
+			Connection co= getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
 			Statement stm = co.createStatement();
 			Logger.log("Puede que nos hayamos conectado a la base de datos");
 			String sql = "CREATE TABLE IF NOT EXISTS RegistroHorario (" + // Crea una tabla con lo siguiente...
@@ -45,7 +47,7 @@ public class Conexión {
 			Logger.log("Vamos a probar a conectar a la base de datos global.");
 			try {
 				Class.forName("com.mysql.cj.jdbc.Driver");
-				Connection conn= DriverManager.getConnection("jdbc:mysql://localhost", StartupManager.username, StartupManager.pass);
+				Connection conn= getConnection("jdbc:mysql://localhost", StartupManager.username, StartupManager.pass);
 				Statement stmt = conn.createStatement();
 				String sql = "CREATE DATABASE LOGINS;";
 				stmt.executeUpdate(sql);
@@ -74,7 +76,7 @@ public class Conexión {
 	public static int insertarEntrada(String dni, String observaciones) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection co= DriverManager.getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
+			Connection co= getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
 			String sql = "INSERT INTO RegistroHorario (dni, fecha, hora_entrada, observaciones) VALUES (?, ?, ?, ?)";
 			try (PreparedStatement pstmt = co.prepareStatement(sql)) {
 				LocalDate fecha = LocalDate.now();       // Fecha actual
@@ -88,6 +90,20 @@ public class Conexión {
 				pstmt.executeUpdate();
 			}
 
+			sql = "UPDATE Empleados SET activo = TRUE WHERE dni = ?";
+
+			try (Connection conn = getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
+			     PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+				stmt.setString(1, dni);
+				int rowsAffected = stmt.executeUpdate();
+				Logger.log("Se activaron " + rowsAffected + " trabajadores.");
+
+			} catch (SQLException e) {
+				Logger.log("Algo falló:");
+				Logger.log(e.toString());
+			}
+
 		} catch (ClassNotFoundException | SQLException e) {
 			Logger.log("Ha ocurrido un problema al insertar la entrada: " + e.getMessage());
 			return 1;
@@ -99,7 +115,7 @@ public class Conexión {
 	public static int insertarSalida(String dni, String observaciones) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection co= DriverManager.getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
+			Connection co= getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
 			String sql = "INSERT INTO RegistroHorario (dni, fecha, hora_salida, observaciones) VALUES (?, ?, ?, ?)";
 			try (PreparedStatement pstmt = co.prepareStatement(sql)) {
 				LocalDate fecha = LocalDate.now();       // Fecha actual
@@ -111,6 +127,20 @@ public class Conexión {
 				pstmt.setString(4, observaciones);
 
 				pstmt.executeUpdate();
+			}
+
+			sql = "UPDATE Empleados SET activo = FALSE WHERE dni = ?";
+
+			try (Connection conn = getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
+			     PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+				stmt.setString(1, dni);
+				int rowsAffected = stmt.executeUpdate();
+				Logger.log("Se desactivaron " + rowsAffected + " trabajadores.");
+
+			} catch (SQLException e) {
+				Logger.log("Algo falló:");
+				Logger.log(e.toString());
 			}
 
 		} catch (ClassNotFoundException | SQLException e) {
