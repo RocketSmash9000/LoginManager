@@ -6,7 +6,7 @@
 
     <groupId>com.github.RocketSmash9000</groupId>
     <artifactId>LoginManager</artifactId>
-    <version>1.4</version>
+    <version>1.4.1</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -32,8 +32,8 @@
         </dependency>
         <dependency>
             <groupId>com.github.RocketSmash9000</groupId>
-            <artifactId>encryptor</artifactId>
-            <version>1.0</version>
+            <artifactId>Encryptor</artifactId>
+            <version>1.1</version>
         </dependency>
     </dependencies>
 

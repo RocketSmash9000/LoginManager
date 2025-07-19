@@ -36,3 +36,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Manual stuff ###
+/Encryptor-1.1.jar

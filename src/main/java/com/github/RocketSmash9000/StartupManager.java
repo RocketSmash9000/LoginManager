@@ -36,9 +36,7 @@ public class StartupManager {
 		File folder = new File(appDataPath, FOLDER_NAME);
 		File file = new File(folder, FILE_NAME);
 
-		if (file.exists())
-			return true;
-		else return false;
+		return file.exists();
 	}
 	public static void firstStartup() {
 		if (!mySQLStartup())

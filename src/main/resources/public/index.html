@@ -160,8 +160,8 @@
             <div class="hint">Formato: 8 números + 1 letra</div>
         </div>
 
-        <!-- Add this new form group after the DNI input -->
-        <div class="form-group" id="passwordGroup" style="display: none;">
+        <!-- Password field is now always visible and required -->
+        <div class="form-group" id="passwordGroup">
             <label for="password">Contraseña</label>
             <input
                     type="password"
@@ -263,21 +263,18 @@
             const data = await response.json();
             isNewUser = data.isNewUser;
 
-            // Show/hide password fields based on user status
-            const passwordGroup = document.getElementById('passwordGroup');
+            // Show/hide confirm password field based on user status
             const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
-            const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('confirmPassword');
 
             if (isNewUser) {
-                passwordGroup.style.display = 'block';
                 confirmPasswordGroup.style.display = 'block';
-                passwordInput.required = true;
+                confirmPasswordInput.required = true;
+                confirmPasswordInput.disabled = false;
             } else {
-                passwordGroup.style.display = 'block';
                 confirmPasswordGroup.style.display = 'none';
-                passwordInput.required = true;
                 confirmPasswordInput.required = false;
+                confirmPasswordInput.disabled = true;
             }
         } catch (error) {
             console.error('Error checking user:', error);
@@ -323,6 +320,16 @@
         return false;
     }
 
+    // Function to clear all form fields
+    function clearForm() {
+        document.getElementById('loginForm').reset();
+        // Only hide the confirm password group, password group stays visible
+        document.getElementById('confirmPasswordGroup').style.display = 'none';
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        if (confirmPasswordInput) confirmPasswordInput.disabled = true;
+        isNewUser = false;
+    }
+
     // Update submitForm function to include password
     async function submitForm(action) {
         const dni = document.getElementById('dni').value;
@@ -334,8 +341,9 @@
             return;
         }
 
-        if (isNewUser && (!password || !validatePassword())) {
-            alert('Por favor, completa correctamente los campos de contraseña');
+        // Password is now always required
+        if (!password || (isNewUser && !validatePassword())) {
+            alert('Por favor, introduce una contraseña válida' + (isNewUser ? ' y confírmala' : ''));
             return;
         }
 
@@ -356,13 +364,8 @@
             if (response.ok) {
                 const result = await response.text();
                 alert(result);
-                if (isNewUser) {
-                    // Reset form after successful registration
-                    document.getElementById('loginForm').reset();
-                    document.getElementById('passwordGroup').style.display = 'none';
-                    document.getElementById('confirmPasswordGroup').style.display = 'none';
-                    isNewUser = false;
-                }
+                // Clear form after successful submission
+                clearForm();
             } else {
                 const error = await response.text();
                 alert('Error: ' + error);
@@ -370,6 +373,7 @@
         } catch (error) {
             console.error('Error:', error);
             alert('Error al procesar la solicitud');
+            clearForm();
         }
     }
 </script>
