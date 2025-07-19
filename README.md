@@ -10,7 +10,7 @@ LoginManager utiliza una interfaz web, de forma que solo hay que conectarse a la
 ### Si se es un trabajador nuevo
 Solo hay que poner el DNI. Una vez se ponga (y se pulse fuera de la caja) se deberá poner una contraseña (junto con su confirmación). Es recomendable que esta contraseña no sea utilizada por ningún otro servicio, por si acaso.
 
-Luego de eso solo es necesario pulsar en el botón de entrada o salida. Si no pone que se ha registrado la entrada o salida, sino que aparece algo distinto, es recomendable refrescar la página y volver a rellenar los campos necesarios.
+Luego de eso solo es necesario pulsar en el botón de entrada o salida. En el caso en que ponga que no se pudieron leer las credenciales, es altamente probable que sea porque el tabajador no está añadido a la tabla `Empleados`. Este error se puede ignorar.
 
 ### Si se es un trabajador existente
 Solo hace falta poner el DNI y la contraseña, y alguna observación en caso de ser necesario.
