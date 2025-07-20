@@ -7,7 +7,7 @@ De momento, solo recibe soporte la versión 1.x de LoginManager.
 ## Reportar una vulnerabilidad
 
 En caso de encontrar una vulneabilidad, se puede hacer dos cosas:
-- Reportar la vulnerabilidad como un [poblema](https://github.com/RocketSmash9000/LoginManager/issues).
+- Reportar la vulnerabilidad como un [aviso de seguridad](https://github.com/RocketSmash9000/LoginManager/security/advisories).
 - Enviar un coreo electrónico a RocketSmash@proton.me explicando la vulnerabilidad, en caso de que sea una vulnerabilidad extremadamente abusable que requiera discreción.
 
 Las vulnerabilidades reportadas se aceptarán o no según el riesgo que suponga para los usuarios a los que LoginManager quiere llegar.
