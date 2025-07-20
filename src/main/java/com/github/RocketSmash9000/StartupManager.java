@@ -119,21 +119,25 @@ public class StartupManager {
 			File folder = new File(appDataPath, FOLDER_NAME);
 			File filePath = new File(folder, FILE_NAME);
 
-			Cryptography.decrypt(filePath);
+			File archivo = Cryptography.decrypt(filePath);
 
-			Path path = Paths.get(filePath.toString());
-			try (var reader = Files.newBufferedReader(path)) {
-				reader.readLine();
-				username = reader.readLine();
-				pass = reader.readLine();
+			try {
+				Path path = Paths.get(archivo.toString());
+				try (var reader = Files.newBufferedReader(path)) {
+					reader.readLine();
+					username = reader.readLine();
+					pass = reader.readLine();
+				}
+				Logger.log("Se han leído las credenciales con éxito.");
+
+				// Delete the decrypted file after reading
+				if (!Files.deleteIfExists(path)) {
+					Logger.log("No se pudo eliminar el archivo desencriptado: " + path);
+				}
 
 			} catch (IOException e) {
-				Logger.log("Error al leer el archivo: " + e.getMessage());
-				return;
+				Logger.log("Error al leer o eliminar el archivo: " + e.getMessage());
 			}
-			Logger.log("Se han leído las credenciales con éxito.");
-
-			Cryptography.encrypt(filePath);
 		}
 	}
 

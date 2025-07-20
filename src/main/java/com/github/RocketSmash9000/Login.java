@@ -17,6 +17,7 @@ public class Login {
 	 * @param pass la contraseña de la persona.
 	 * @return 0 si existe el usuario y la contraseña es válida, 1 si el usuario existe pero la contraseña es inválida, 2 si no existe el ususario y 3 si algo salió mal.
 	 */
+	@SuppressWarnings("t")
 	public static int validarUsuario(String dni, String pass) {
 		String appDataPath = System.getenv("APPDATA");
 
@@ -32,9 +33,7 @@ public class Login {
 		if (!file.exists())
 			return 3;
 
-		Cryptography.decrypt(file);
-
-		Path path = Paths.get(file.toString());
+		Path path = Paths.get(Cryptography.decrypt(file).toString());
 		try (var reader = Files.newBufferedReader(path)) {
 			boolean encontrado = false;
 			boolean contraseña = false;
@@ -45,13 +44,17 @@ public class Login {
 					contraseña = true;
 				}
 				if (encontrado && contraseña) {
-					Cryptography.encrypt(file);
+					if (!Files.deleteIfExists(path)) {
+						Logger.log("No se pudo eliminar el archivo desencriptado: " + path);
+					}
 					return 0;
 				}
 			}
 
 			if (encontrado) {
-				Cryptography.encrypt(file);
+				if (!Files.deleteIfExists(path)) {
+					Logger.log("No se pudo eliminar el archivo desencriptado: " + path);
+				}
 				return 1;
 			}
 
@@ -60,7 +63,13 @@ public class Login {
 			return 3;
 		}
 
-		Cryptography.encrypt(file);
+		try {
+			if (!Files.deleteIfExists(path)) {
+				Logger.log("No se pudo eliminar el archivo desencriptado: " + path);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		return 2;
 	}
 
@@ -90,13 +99,13 @@ public class Login {
 			return false;
 		}
 
-		Cryptography.decrypt(file);
+		File archivo = Cryptography.decrypt(file);
 
+		Path path = Paths.get(archivo.toString());
 		try {
 			// Append the new user credentials
-			Path path = Paths.get(file.toString());
 			String newLine = System.lineSeparator();
-			String credentials = (file.length() > 0 ? newLine : "") + dni + newLine + contraseña;
+			String credentials = (archivo.length() > 0 ? newLine : "") + dni + newLine + contraseña;
 
 			Files.write(path, credentials.getBytes(), java.nio.file.StandardOpenOption.APPEND);
 			Logger.log("Usuario " + dni + " añadido correctamente.");
@@ -105,8 +114,14 @@ public class Login {
 			Logger.log("Error al añadir al usuario: " + e.getMessage());
 			return false;
 		} finally {
-			// Always encrypt the file, even if there was an error
-			Cryptography.encrypt(file);
+			try {
+				Cryptography.encrypt(archivo);
+				if (!Files.deleteIfExists(path)) {
+					Logger.log("No se pudo eliminar el archivo desencriptado: " + archivo);
+				}
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 }
