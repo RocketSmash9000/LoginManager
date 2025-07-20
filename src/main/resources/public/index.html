@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="es_es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -136,9 +136,36 @@
             opacity: 1;
         }
         
-        textarea {
+        textarea, select {
             resize: vertical;
-            min-height: 100px;
+            min-height: 40px;
+            width: 100%;
+            padding: 0.8rem 1rem;
+            margin: 0.3rem 0 0.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: var(--light-gray);
+            color: #333333;
+        }
+        
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            background-color: white;
+        }
+        
+        .form-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.7em top 50%;
+            background-size: 1em auto;
+            padding-right: 2.5em;
         }
     </style>
     <link rel="icon" href="LoginManager.png" sizes="32x32" type="image/png">
@@ -185,11 +212,25 @@
         </div>
 
         <div class="form-group">
+            <label for="tipoObservacion">Tipo de Observación (opcional)</label>
+            <select id="tipoObservacion" class="form-select" onchange="updateObservacion()">
+                <option value="">Selecciona una opción...</option>
+                <option value="">Ninguna observación</option>
+                <option value="Almuerzo">Almuerzo</option>
+                <option value="Comida">Comida</option>
+                <option value="Comida">Cena</option>
+                <option value="Visita al médico">Visita al médico</option>
+                <option value="Horas extra">Horas extra</option>
+                <option value="Vacaciones">Vacaciones</option>
+                <option value="otro">Otro</option>
+            </select>
+        </div>
+        <div class="form-group" id="observacionesGroup" style="display: none;">
             <label for="observaciones">Observaciones (opcional)</label>
             <textarea 
                 id="observaciones" 
                 name="observaciones" 
-                placeholder="Ej: Vacaciones hasta..."
+                placeholder="Escribe aquí tus observaciones..."
                 maxlength="500"></textarea>
             <div class="hint">Máximo 500 caracteres</div>
         </div>
@@ -208,11 +249,48 @@
             </button>
         </div>
     </form>
+    <div class="footer" style="margin-top: 2rem; text-align: center; font-size: 0.8rem; color: #6c757d; opacity: 0.7; transition: opacity 0.3s ease;">
+        Creado por <a href="https://github.com/RocketSmash9000" target="_blank" style="color: #4361ee; text-decoration: none;">RocketSmash</a>
+    </div>
 </div>
+
+<style>
+    .footer:hover {
+        opacity: 1;
+    }
+    .footer a:hover {
+        text-decoration: underline;
+    }
+</style>
 <script>
+    function updateObservacion() {
+        const tipoObservacion = document.getElementById('tipoObservacion');
+        const observaciones = document.getElementById('observaciones');
+        const observacionesGroup = document.getElementById('observacionesGroup');
+        
+        if (tipoObservacion.value === 'otro') {
+            observaciones.placeholder = 'Escribe aquí tus observaciones...';
+            observaciones.disabled = false;
+            observaciones.value = '';
+            observacionesGroup.style.display = 'block';
+        } else {
+            observaciones.value = tipoObservacion.value || '';
+            observacionesGroup.style.display = 'none';
+        }
+    }
+
     function submitForm(action) {
-        const dni = document.getElementById('dni').value;
-        const observaciones = document.getElementById('observaciones').value;
+        const dni = getDniValue();
+        const tipoObservacion = document.getElementById('tipoObservacion').value;
+        let observaciones = '';
+        
+        if (tipoObservacion === 'otro') {
+            observaciones = document.getElementById('observaciones').value;
+        } else if (tipoObservacion) {
+            observaciones = tipoObservacion;
+        } else {
+            observaciones = document.getElementById('observaciones').value;
+        }
 
         if (!dni) {
             alert('Por favor, introduce un DNI');
@@ -237,6 +315,8 @@
             alert(data);
             document.getElementById('dni').value = '';
             document.getElementById('observaciones').value = '';
+            document.getElementById('tipoObservacion').value = '';
+            document.getElementById('observacionesGroup').style.display = 'none';
         })
         .catch(error => {
             console.error('Error:', error);
@@ -248,7 +328,7 @@
 
     // Check if user exists when DNI loses focus
     document.getElementById('dni').addEventListener('blur', async function() {
-        const dni = this.value.trim();
+        const dni = getDniValue().trim();
         if (!dni) return;
 
         try {
@@ -280,6 +360,27 @@
             console.error('Error checking user:', error);
         }
     });
+
+    // DNI uppercase conversion and handling
+    const dniInput = document.getElementById('dni');
+    if (dniInput) {
+        // Convert to uppercase on input
+        dniInput.addEventListener('input', function() {
+            const cursorPosition = this.selectionStart;
+            this.value = this.value.toUpperCase();
+            this.setSelectionRange(cursorPosition, cursorPosition);
+        });
+        
+        // Ensure uppercase on blur (when field loses focus)
+        dniInput.addEventListener('blur', function() {
+            this.value = this.value.toUpperCase();
+        });
+    }
+    
+    // Function to get DNI value in uppercase
+    function getDniValue() {
+        return document.getElementById('dni').value.toUpperCase();
+    }
 
     // Password confirmation validation
     const passwordInput = document.getElementById('password');
@@ -378,4 +479,4 @@
     }
 </script>
 </body>
-</html>
+</html
