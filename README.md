@@ -17,8 +17,8 @@ Luego de eso solo es necesario pulsar en el botón de entrada o salida. En el ca
 ### Si se es un trabajador existente
 Solo hace falta poner el DNI y la contraseña, y alguna observación en caso de ser necesario.
 
-## Dependencias
-LoginManager necesita lo siguiente para poder funcionar adecuadamente:
+## Requisitos
+LoginManager necesita el siguiente software para poder funcionar:
 - Un dispositivo Windows donde funcionar.
   - *Opcionalmente puede funcionar en Linux si se usa [Wine](https://www.winehq.org/). Su funcionamiento no está garantizado.*
 - Java 21 (preferiblemente de [Eclipse Adoptium](https://adoptium.net/es/temurin/releases?version=21&os=any&arch=any)).
