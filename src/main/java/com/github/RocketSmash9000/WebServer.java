@@ -32,6 +32,19 @@ public class WebServer {
         // Configure Spark
         port(2048);
         staticFiles.location("/public"); // Serve static files from resources/public
+        staticFiles.expireTime(600); // Cache static files for 10 minutes
+        
+        // Add a route to serve the mis-registros.html file
+        get("/mis-registros", (req, res) -> {
+            res.redirect("/mis-registros.html");
+            return null;
+        });
+        
+        // Add a route to serve the root path
+        get("/", (req, res) -> {
+            res.redirect("/index.html");
+            return null;
+        });
 
         // Enable CORS
         options("/*", (request, response) -> {
@@ -149,6 +162,29 @@ public class WebServer {
             boolean isNewUser = (userStatus == 2); // 2 means user doesn't exist
 
             return "{\"isNewUser\":" + isNewUser + "}";
+        });
+
+        // API endpoint to get user records
+        get("/api/mis-registros", (req, res) -> {
+            String dni = req.queryParams("dni");
+            String password = req.queryParams("password");
+            
+            if (dni == null || dni.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+                res.status(400);
+                return "{\"error\":\"Se requieren DNI y contraseña\"}";
+            }
+            
+            // Validate user credentials
+            int userStatus = Login.validarUsuario(dni, password);
+            if (userStatus != 0) { // 0 means valid credentials
+                res.status(401);
+                return "{\"error\":\"Credenciales inválidas\"}";
+            }
+            
+            // Get user records
+            String records = Conexión.obtenerRegistrosUsuario(dni);
+            res.type("application/json");
+            return records;
         });
     }
 }

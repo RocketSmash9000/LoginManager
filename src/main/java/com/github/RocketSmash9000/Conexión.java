@@ -3,6 +3,8 @@ package com.github.RocketSmash9000;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import static java.sql.DriverManager.getConnection;
 
@@ -149,5 +151,55 @@ public class Conexión {
 		}
 		Logger.log("La salida de la persona con DNI " + dni + " ha sido registrada.");
 		return 0; // Devuelve 0 si no ha habido ningún error
+	}
+
+	public static String obtenerRegistrosUsuario(String dni) {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			String sql = "SELECT fecha, hora_entrada, hora_salida FROM RegistroHorario " +
+					   "WHERE dni = ? ORDER BY id DESC";
+			
+			try (Connection conn = getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
+			     PreparedStatement pstmt = conn.prepareStatement(sql)) {
+				
+				pstmt.setString(1, dni);
+				ResultSet rs = pstmt.executeQuery();
+				
+				// Create a JSON array to hold the records
+				JSONArray records = new JSONArray();
+				
+				while (rs.next()) {
+					JSONObject record = new JSONObject();
+					record.put("fecha", rs.getDate("fecha").toString());
+					
+					Time horaEntrada = rs.getTime("hora_entrada");
+					Time horaSalida = rs.getTime("hora_salida");
+					
+					if (horaEntrada != null) {
+						record.put("hora_entrada", horaEntrada.toString());
+					} else {
+						record.put("hora_entrada", "");
+					}
+					
+					if (horaSalida != null) {
+						record.put("hora_salida", horaSalida.toString());
+					} else {
+						record.put("hora_salida", "");
+					}
+					
+					records.add(record);
+				}
+				
+				return records.toJSONString();
+				
+			} catch (SQLException e) {
+				Logger.log("Error al obtener registros: " + e.getMessage());
+				return "[]";
+			}
+			
+		} catch (ClassNotFoundException e) {
+			Logger.log("Error: " + e.getMessage());
+			return "[]";
+		}
 	}
 }
