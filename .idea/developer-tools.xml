@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DeveloperToolsToolWindowSettingsV1" lastSelectedContentNodeId="ascii-art" pluginVersion="7.1.0">
+    <developerToolsConfigurations>
+      <developerToolConfiguration developerToolId="ascii-art" id="b5471562-fd6c-4b70-972b-e2692041e464" name="Workbench">
+        <properties>
+          <property key="textInput" type="INPUT" value="kotlin.String|LoginManager" />
+          <property key="selectedFontFileName" type="CONFIGURATION" value="kotlin.String|Nancyj-Improved.flf" />
+        </properties>
+      </developerToolConfiguration>
+    </developerToolsConfigurations>
+  </component>
+</project>
