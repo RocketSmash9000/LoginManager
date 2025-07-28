@@ -1,11 +1,18 @@
 package com.github.RocketSmash9000; // Make sure you have the correct package declaration
 
+import com.github.RocketSmash9000.config.Config;
+import org.fusesource.jansi.AnsiConsole;
+
 import static spark.Spark.*;
 
 public class WebServer {
 	static boolean credFileExists;
 	@SuppressWarnings("t")
 	public static void main(String[] args) {
+		System.setProperty("jansi.passthrough", "true");
+		AnsiConsole.systemInstall();
+		Config.set("Storage.baseDir",System.getenv("APPDATA") + "\\AnyManager");
+
 		System.out.println("""
                 dP                          oo          8888ba.88ba                                                       \s
                 88                                      88  `8b  `8b                                                      \s

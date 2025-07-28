@@ -1,5 +1,8 @@
 package com.github.RocketSmash9000;
 
+import com.github.RocketSmash9000.config.Config;
+import com.github.RocketSmash9000.util.Logger;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -7,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import static java.lang.System.exit;
@@ -14,7 +18,7 @@ import static java.lang.System.exit;
 public class StartupManager {
     private static final String MYSQL_SERVICE_NAME = "MySQL"; // Default MySQL service name, change if different
 	// The name of your application's folder.
-	public static final String FOLDER_NAME = "LoginManager";
+	public static final String FOLDER_NAME = Config.CONFIG_DIR;
 
 	// The name of the file you want to create.
 	public static final String FILE_NAME = "Credentials.txt";
@@ -29,11 +33,11 @@ public class StartupManager {
 
 		// Check if the APPDATA environment variable exists.
 		if (appDataPath == null || appDataPath.isEmpty()) {
-			Logger.log("La variable de entorno APPDATA no fue encontrada. ¿Esto es Windows?");
+			Logger.warn("La variable de entorno APPDATA no fue encontrada. ¿Esto es Windows?");
 			return false;
 		}
 
-		File folder = new File(appDataPath, FOLDER_NAME);
+		File folder = new File(FOLDER_NAME);
 		File file = new File(folder, FILE_NAME);
 
 		return file.exists();
@@ -63,21 +67,21 @@ public class StartupManager {
 
 			// Check if the APPDATA environment variable exists.
 			if (appDataPath == null || appDataPath.isEmpty()) {
-				Logger.log("La variable de entorno APPDATA no fue encontrada. ¿Esto es Windows?");
+				Logger.warn("La variable de entorno APPDATA no fue encontrada. ¿Esto es Windows?");
 				return;
 			}
 
 			// 2. Create a File object for your application's subfolder.
-			File appFolder = new File(appDataPath, FOLDER_NAME);
+			File appFolder = new File(FOLDER_NAME);
 
 			// 3. Create the directory if it does not exist.
 			// use mkdirs() to create parent directories if they don't exist.
 			if (!appFolder.exists()) {
 				boolean created = appFolder.mkdirs();
 				if (created) {
-					Logger.log("Se ha creado el directorio: " + appFolder.getAbsolutePath());
+					Logger.debug("Se ha creado el directorio: " + appFolder.getAbsolutePath());
 				} else {
-					Logger.log("No se pudo crear el directorio: " + appFolder.getAbsolutePath() + ". Es posible que ya exista.");
+					Logger.debug("No se pudo crear el directorio: " + appFolder.getAbsolutePath() + ". Es posible que ya exista.");
 					return;
 				}
 			}
@@ -93,14 +97,14 @@ public class StartupManager {
 				writer.write(fileContent);
 			}
 
-			Logger.log("Se ha escrito en el archivo: " + file.getAbsolutePath());
+			Logger.debug("Se ha escrito en el archivo: " + file.getAbsolutePath());
 
 			Cryptography.firstEncrypt(file);
 
 		} catch (IOException e) {
 			// Handle potential input/output errors (e.g., permission denied).
-			Logger.log("Un error ocurrió durante la ejecución del primer inicio:");
-			e.printStackTrace();
+			Logger.error("Un error ocurrió durante la ejecución del primer inicio:");
+			Logger.error(Arrays.toString(e.getStackTrace()));
 		}
 	} // The Scanner is automatically closed here by the try-with-resources statement
 
@@ -112,11 +116,11 @@ public class StartupManager {
 
 			// Check if the APPDATA environment variable exists.
 			if (appDataPath == null || appDataPath.isEmpty()) {
-				Logger.log("La variable de entorno APPDATA no fue encontrada. ¿Esto es Windows?");
+				Logger.warn("La variable de entorno APPDATA no fue encontrada. ¿Esto es Windows?");
 				return;
 			}
 
-			File folder = new File(appDataPath, FOLDER_NAME);
+			File folder = new File(FOLDER_NAME);
 			File filePath = new File(folder, FILE_NAME);
 
 			File archivo = Cryptography.decrypt(filePath);
@@ -128,15 +132,16 @@ public class StartupManager {
 					username = reader.readLine();
 					pass = reader.readLine();
 				}
-				Logger.log("Se han leído las credenciales con éxito.");
+				Logger.debug("Se han leído las credenciales con éxito.");
 
 				// Delete the decrypted file after reading
 				if (!Files.deleteIfExists(path)) {
-					Logger.log("No se pudo eliminar el archivo desencriptado: " + path);
+					Logger.warn("No se pudo eliminar el archivo desencriptado: " + path);
 				}
 
 			} catch (IOException e) {
-				Logger.log("Error al leer o eliminar el archivo: " + e.getMessage());
+				Logger.error("Error al leer o eliminar el archivo: " + e.getMessage());
+				Logger.debug(Arrays.toString(e.getStackTrace()));
 			}
 		}
 	}
@@ -156,37 +161,38 @@ public class StartupManager {
             String output = new String(checkProcess.getInputStream().readAllBytes());
             
             if (output.contains("RUNNING")) {
-                Logger.log("MySQL ya está funcionando.");
+                Logger.debug("MySQL ya está funcionando.");
                 return true;
             } else if (output.contains("STOPPED")) {
-                Logger.log("MySQL está parado. Vamos a intentar iniciarlo...");
+                Logger.info("MySQL está parado. Vamos a intentar iniciarlo...");
                 
                 // Try to start the service
                 Process startProcess = Runtime.getRuntime().exec("net start " + MYSQL_SERVICE_NAME);
                 int exitCode = startProcess.waitFor();
                 
                 if (exitCode == 0) {
-                    Logger.log("MySQL se pudo ejecutar exitosamente.");
+                    Logger.info("MySQL se pudo ejecutar exitosamente.");
                     return true;
                 } else {
                     String error = new String(startProcess.getErrorStream().readAllBytes());
-                    Logger.log("No se pudo iniciar MySQL. Código de salida: " + exitCode);
-                    Logger.log("Error: " + error);
-					Logger.log("Por favor, inicia MySQL manualmente o contacta con el autor.");
+                    Logger.error("No se pudo iniciar MySQL. Código de salida: " + exitCode);
+                    Logger.error("Error: " + error);
+					Logger.info("Por favor, inicia MySQL manualmente o contacta con el autor.");
                     return false;
                 }
             } else if (output.contains("FAILED 1060")) {
-                Logger.log("MySQL no está instalado o el nombre del servicio es incorrecto.");
-	            Logger.log("Por favor, inicia MySQL manualmente si está instalado o contacta con el autor.");
+                Logger.warn("MySQL no está instalado o el nombre del servicio es incorrecto.");
+	            Logger.info("Por favor, inicia MySQL manualmente si está instalado o contacta con el autor.");
                 return false;
             } else {
-                Logger.log("Ha ocurrido un problema inesperado: " + output);
-	            Logger.log("Contacta con el autor para resolver el problema.");
+                Logger.error("Ha ocurrido un problema inesperado: " + output);
+	            Logger.info("Contacta con el autor para resolver el problema.");
                 return false;
             }
         } catch (IOException | InterruptedException e) {
-            Logger.log("Hubo un error al comprobar el mensaje de retorno: " + e.getMessage());
-	        Logger.log("Por favor, contacta con el autor.");
+            Logger.error("Hubo un error al comprobar el mensaje de retorno: " + e.getMessage());
+	        Logger.debug(Arrays.toString(e.getStackTrace()));
+	        Logger.info("Por favor, contacta con el autor.");
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }

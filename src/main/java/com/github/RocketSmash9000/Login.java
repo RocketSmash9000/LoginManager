@@ -1,10 +1,13 @@
 package com.github.RocketSmash9000;
 
+import com.github.RocketSmash9000.util.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import static com.github.RocketSmash9000.StartupManager.FILE_NAME;
 import static com.github.RocketSmash9000.StartupManager.FOLDER_NAME;
@@ -23,11 +26,11 @@ public class Login {
 
 		// Check if the APPDATA environment variable exists.
 		if (appDataPath == null || appDataPath.isEmpty()) {
-			Logger.log("La variable de entorno APPDATA no fue encontrada. ¿Esto es Windows?");
+			Logger.warn("La variable de entorno APPDATA no fue encontrada. ¿Esto es Windows?");
 			return 3;
 		}
 
-		File folder = new File(appDataPath, FOLDER_NAME);
+		File folder = new File(FOLDER_NAME);
 		File file = new File(folder, FILE_NAME);
 
 		if (!file.exists())
@@ -45,7 +48,7 @@ public class Login {
 				}
 				if (encontrado && contraseña) {
 					if (!Files.deleteIfExists(path)) {
-						Logger.log("No se pudo eliminar el archivo desencriptado: " + path);
+						Logger.error("No se pudo eliminar el archivo desencriptado: " + path);
 					}
 					return 0;
 				}
@@ -53,19 +56,20 @@ public class Login {
 
 			if (encontrado) {
 				if (!Files.deleteIfExists(path)) {
-					Logger.log("No se pudo eliminar el archivo desencriptado: " + path);
+					Logger.error("No se pudo eliminar el archivo desencriptado: " + path);
 				}
 				return 1;
 			}
 
 		} catch (IOException e) {
-			Logger.log("Error al leer el archivo: " + e.getMessage());
+			Logger.error("Error al leer el archivo: " + e.getMessage());
+			Logger.error(Arrays.toString(e.getStackTrace()));
 			return 3;
 		}
 
 		try {
 			if (!Files.deleteIfExists(path)) {
-				Logger.log("No se pudo eliminar el archivo desencriptado: " + path);
+				Logger.error("No se pudo eliminar el archivo desencriptado: " + path);
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -80,22 +84,22 @@ public class Login {
 
 		// Check if the APPDATA environment variable exists.
 		if (appDataPath == null || appDataPath.isEmpty()) {
-			Logger.log("La variable de entorno APPDATA no fue encontrada. ¿Esto es Windows?");
+			Logger.warn("La variable de entorno APPDATA no fue encontrada. ¿Esto es Windows?");
 			return false;
 		}
 
-		File folder = new File(appDataPath, FOLDER_NAME);
+		File folder = new File(FOLDER_NAME);
 		File file = new File(folder, FILE_NAME);
 
 		if (!file.exists()) {
-			Logger.log("El archivo no existe. Raro, no?");
+			Logger.warn("El archivo no existe. Raro, no?");
 			return false;
 		}
 
 		// Check if user already exists
 		int userStatus = validarUsuario(dni, "");
 		if (userStatus != 2) { // 2 means user doesn't exist
-			Logger.log("El usuario con DNI " + dni + " ya existe.");
+			Logger.debug("El usuario con DNI " + dni + " ya existe.");
 			return false;
 		}
 
@@ -108,16 +112,17 @@ public class Login {
 			String credentials = (archivo.length() > 0 ? newLine : "") + dni + newLine + contraseña;
 
 			Files.write(path, credentials.getBytes(), java.nio.file.StandardOpenOption.APPEND);
-			Logger.log("Usuario " + dni + " añadido correctamente.");
+			Logger.debug("Usuario " + dni + " añadido correctamente.");
 			return true;
 		} catch (IOException e) {
-			Logger.log("Error al añadir al usuario: " + e.getMessage());
+			Logger.error("Error al añadir al usuario: " + e.getMessage());
+			Logger.error(Arrays.toString(e.getStackTrace()));
 			return false;
 		} finally {
 			try {
 				Cryptography.encrypt(archivo);
 				if (!Files.deleteIfExists(path)) {
-					Logger.log("No se pudo eliminar el archivo desencriptado: " + archivo);
+					Logger.error("No se pudo eliminar el archivo desencriptado: " + archivo);
 				}
 			} catch (IOException e) {
 				throw new RuntimeException(e);

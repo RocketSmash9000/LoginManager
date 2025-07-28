@@ -8,6 +8,7 @@
           <option value="LoginManagerToo" />
           <option value="LoginManagerToo" />
           <option value="LoginManagerToo" />
+          <option value="LoginManagerToo" />
         </list>
       </option>
       <option name="ignoredPackages">
@@ -15,10 +16,12 @@
           <option value="org.eclipse.jetty:jetty-http:9.4.48.v20220622" />
           <option value="org.eclipse.jetty:jetty-server:9.4.48.v20220622" />
           <option value="org.eclipse.jetty:jetty-xml:9.4.48.v20220622" />
+          <option value="junit:junit:4.10" />
         </list>
       </option>
       <option name="ignoredReasons">
         <list>
+          <option value="Not exploitable" />
           <option value="Not exploitable" />
           <option value="Not exploitable" />
           <option value="Not exploitable" />

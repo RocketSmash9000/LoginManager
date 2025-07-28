@@ -3,6 +3,9 @@ package com.github.RocketSmash9000;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
+
+import com.github.RocketSmash9000.util.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -14,7 +17,7 @@ public class Conexión {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			Connection co= getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
 			Statement stm = co.createStatement();
-			Logger.log("Puede que nos hayamos conectado a la base de datos");
+			Logger.debug("Puede que nos hayamos conectado a la base de datos");
 			String sql = "CREATE TABLE IF NOT EXISTS RegistroHorario (" + // Crea una tabla con lo siguiente...
 					"id INT AUTO_INCREMENT PRIMARY KEY, " + // Una columna que va incrementando según se vayan insertando las cosas.
 					"dni VARCHAR(20) NOT NULL, " + // Una columna con el DNI del trabajador
@@ -32,45 +35,50 @@ public class Conexión {
 			stm.executeUpdate(sql);
 
 
-			Logger.log("Pues nos hemos conectado.");
+			Logger.info("Nos hemos conectado a la base de datos.");
 			return 0;
 
 		} catch (ClassNotFoundException e) {
-			Logger.log("Clase no encontrada: "+e);
+			Logger.error("Clase no encontrada: "+ e);
+			Logger.debug(Arrays.toString(e.getStackTrace()));
 			return 2;
 
 		} catch (SQLSyntaxErrorException e) {
-			Logger.log("Es altamente probable que la tabla ya exista, así que vamos directos al final.");
-			Logger.log(e.toString());
+			Logger.debug("Es altamente probable que la tabla ya exista, así que vamos directos al final.");
+			Logger.error("Error ignorable: " + e.getMessage());
+			Logger.debug(Arrays.toString(e.getStackTrace()));
 			return 0;
 
 		} catch (SQLException e) {
-			Logger.log("Error de conexion: "+e);
-			Logger.log("Vamos a probar a conectar a la base de datos global.");
+			Logger.error("Error de conexion: "+ e.getMessage());
+			Logger.debug(Arrays.toString(e.getStackTrace()));
+			Logger.info("Vamos a probar a conectar a la base de datos global.");
 			try {
 				Class.forName("com.mysql.cj.jdbc.Driver");
 				Connection conn= getConnection("jdbc:mysql://localhost", StartupManager.username, StartupManager.pass);
 				Statement stmt = conn.createStatement();
 				String sql = "CREATE DATABASE LOGINS;";
 				stmt.executeUpdate(sql);
-				Logger.log("Base de datos creada");
+				Logger.debug("Base de datos creada");
 				return 1;
 
 			} catch (ClassNotFoundException a) {
-				Logger.log("La clase no se encontró");
+				Logger.error("La clase no se encontró");
 				return 2;
 
 			} catch (SQLException a) {
-				Logger.log("Ha pasado algo con SQL pero vamos a hacer como que no ha habido ningún problema.");
+				Logger.error("Ha pasado algo con SQL pero vamos a hacer como que no ha habido ningún problema.");
 				return 2;
 
 			} catch (Exception a) {
-				Logger.log("Pues nada. Un error raro chungo.");
+				Logger.error("Pues nada. Un error raro chungo. " + a.getMessage());
+				Logger.debug(Arrays.toString(a.getStackTrace()));
 				return 2;
 			}
 
 		} catch (Exception e) {
-			Logger.log("Error desconocido: "+e);
+			Logger.error("Error desconocido: "+ e.getMessage());
+			Logger.debug(Arrays.toString(e.getStackTrace()));
 			return 2;
 		}
 	}
@@ -99,18 +107,19 @@ public class Conexión {
 
 				stmt.setString(1, dni);
 				int rowsAffected = stmt.executeUpdate();
-				Logger.log("Se activaron " + rowsAffected + " trabajadores.");
+				Logger.debug("Se activaron " + rowsAffected + " trabajadores.");
 
 			} catch (SQLException e) {
-				Logger.log("Algo falló:");
-				Logger.log(e.toString());
+				Logger.error("Algo falló: " + e.getMessage());
+				Logger.debug(Arrays.toString(e.getStackTrace()));
 			}
 
 		} catch (ClassNotFoundException | SQLException e) {
-			Logger.log("Ha ocurrido un problema al insertar la entrada: " + e.getMessage());
+			Logger.error("Ha ocurrido un problema al insertar la entrada: " + e.getMessage());
+			Logger.debug(Arrays.toString(e.getStackTrace()));
 			return 1;
 		}
-		Logger.log("La entrada de la persona con DNI " + dni + " ha sido registrada.");
+		Logger.info("La entrada de la persona con DNI " + dni + " ha sido registrada.");
 		return 0; // Devuelve 0 si no ha habido ningún error
 	}
 
@@ -138,18 +147,19 @@ public class Conexión {
 
 				stmt.setString(1, dni);
 				int rowsAffected = stmt.executeUpdate();
-				Logger.log("Se desactivaron " + rowsAffected + " trabajadores.");
+				Logger.debug("Se desactivaron " + rowsAffected + " trabajadores.");
 
 			} catch (SQLException e) {
-				Logger.log("Algo falló:");
-				Logger.log(e.toString());
+				Logger.error("Algo falló: " + e.getMessage());
+				Logger.debug(Arrays.toString(e.getStackTrace()));
 			}
 
 		} catch (ClassNotFoundException | SQLException e) {
-			Logger.log("Ha ocurrido un problema al insertar la salida: " + e.getMessage());
+			Logger.error("Ha ocurrido un problema al insertar la salida: " + e.getMessage());
+			Logger.debug(Arrays.toString(e.getStackTrace()));
 			return 1;
 		}
-		Logger.log("La salida de la persona con DNI " + dni + " ha sido registrada.");
+		Logger.info("La salida de la persona con DNI " + dni + " ha sido registrada.");
 		return 0; // Devuelve 0 si no ha habido ningún error
 	}
 
@@ -193,12 +203,14 @@ public class Conexión {
 				return records.toJSONString();
 				
 			} catch (SQLException e) {
-				Logger.log("Error al obtener registros: " + e.getMessage());
+				Logger.error("Error al obtener registros: " + e.getMessage());
+				Logger.debug(Arrays.toString(e.getStackTrace()));
 				return "[]";
 			}
 			
 		} catch (ClassNotFoundException e) {
-			Logger.log("Error: " + e.getMessage());
+			Logger.error("Error: " + e.getMessage());
+			Logger.debug(Arrays.toString(e.getStackTrace()));
 			return "[]";
 		}
 	}
