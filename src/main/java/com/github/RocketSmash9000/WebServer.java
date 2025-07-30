@@ -1,17 +1,49 @@
 package com.github.RocketSmash9000; // Make sure you have the correct package declaration
 
 import com.github.RocketSmash9000.config.Config;
+import com.github.RocketSmash9000.util.Logger;
 import org.fusesource.jansi.AnsiConsole;
 
+import java.io.File;
+
+import static java.lang.System.exit;
 import static spark.Spark.*;
 
 public class WebServer {
 	static boolean credFileExists;
-	@SuppressWarnings("t")
+	private static boolean logLevelChanged = false;
+	@SuppressWarnings({"t", "D"})
 	public static void main(String[] args) {
 		System.setProperty("jansi.passthrough", "true");
 		AnsiConsole.systemInstall();
 		Config.set("Storage.baseDir",System.getenv("APPDATA") + "\\AnyManager");
+
+		// Guarda en la configuración el sitio donde se ha ejecutado LoginManager por última vez.
+		String userDirectory = new File("").getAbsolutePath();
+		Config.set("System.loginLast", userDirectory);
+
+		final int LOG_LEVEL = Config.getInt("Logger.logLevel", 1);
+
+		for (String v : args) {
+			// Obtiene la versión del programa
+			if (v.equals("-v") || v.equals("--version")) {
+				String version = Version.getVersion();
+				System.out.println("Versión: " + (version != null ? version : "Desarrollo"));
+				exit(0);
+			}
+
+			// Imprime todos los logs durante una sola ejecución
+			if (v.equals("-a") || v.equals("--all")) {
+				Config.setInt("Logger.logLevel", 0);
+				logLevelChanged = true;
+			}
+
+			// Durante una sola ejecución, solo imprimirá logs de nivel 4
+			if (v.equals("-n") || v.equals("--none")) {
+				Config.setInt("Logger.logLevel", 4);
+				logLevelChanged = true;
+			}
+		}
 
 		System.out.println("""
                 dP                          oo          8888ba.88ba                                                       \s
@@ -23,6 +55,15 @@ public class WebServer {
                                         .88                                                          .88                  \s
                                     d8888P                                                       d8888P                   \s""");
 		System.out.println("\n                            Un programa creado por RocketSmash9000\n");
+
+		//* Configurar el apagado limpio
+		//* En caso de necesitar devolver algo a su estado original, usar este bloque
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			if (logLevelChanged) {
+				Logger.debug("Devolviendo el nivel de log al original...");
+				Config.setInt("Logger.logLevel", LOG_LEVEL);
+			}
+		}));
 
 		credFileExists = StartupManager.credFileExists();
 		if (!credFileExists) {
@@ -198,5 +239,11 @@ public class WebServer {
 			res.type("application/json");
 			return records;
 		});
+	}
+}
+
+class Version {
+	public static String getVersion() {
+		return Version.class.getPackage().getImplementationVersion();
 	}
 }
