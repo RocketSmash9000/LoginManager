@@ -43,14 +43,8 @@ public class Conexión {
 			Logger.debug(Arrays.toString(e.getStackTrace()));
 			return 2;
 
-		} catch (SQLSyntaxErrorException e) {
-			Logger.debug("Es altamente probable que la tabla ya exista, así que vamos directos al final.");
-			Logger.error("Error ignorable: " + e.getMessage());
-			Logger.debug(Arrays.toString(e.getStackTrace()));
-			return 0;
-
 		} catch (SQLException e) {
-			Logger.error("Error de conexion: "+ e.getMessage());
+			Logger.error("Error ignorable: "+ e.getMessage());
 			Logger.debug(Arrays.toString(e.getStackTrace()));
 			Logger.info("Vamos a probar a conectar a la base de datos global.");
 			try {
