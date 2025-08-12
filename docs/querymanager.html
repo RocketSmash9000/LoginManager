@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QueryManager - Gestión Avanzada para LoginManager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Estilos específicos para la página de QueryManager */
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #0d6efd;
+            margin-bottom: 1rem;
+        }
+        
+        .pricing-card {
+            border: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pricing-header {
+            background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+        
+        .price-period {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .pricing-features {
+            padding: 2rem;
+        }
+        
+        .pricing-features ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .pricing-features li {
+            padding: 0.5rem 0;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .pricing-features li:before {
+            content: "✓";
+            color: #198754;
+            position: absolute;
+            left: 0;
+        }
+        
+        .screenshot {
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .screenshot img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">LoginManager</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="querymanager.html">QueryManager</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#planes">Precios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contacto">Contacto</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-light py-5">
+        <div class="container text-center">
+            <div class="hero-content">
+                <span class="badge bg-primary mb-3">SOLUCIÓN PROFESIONAL</span>
+                <h1 class="display-4 fw-bold mb-3">
+                    <span class="text-primary">QueryManager</span>
+                </h1>
+                <div class="hero-subtitle">
+                    <p class="lead mb-4">La herramienta definitiva para la gestión avanzada de registros de asistencia</p>
+                    <p class="text-muted">Complemento potente para LoginManager con funciones de administración avanzadas</p>
+                </div>
+                <div class="hero-buttons mt-4">
+                    <a href="#contacto" class="btn btn-primary btn-lg me-3">
+                        <i class="bi bi-envelope"></i> Solicitar Información
+                    </a>
+                    <a href="#caracteristicas" class="btn btn-outline-primary btn-lg">
+                        <i class="bi bi-info-circle"></i> Ver Características
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Características -->
+    <section id="caracteristicas" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Características Principales</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="text-center p-4">
+                        <div class="feature-icon">
+                            <i class="bi bi-lightning"></i>
+                        </div>
+                        <h3>Interfaz sencilla</h3>
+                        <p>Una interfaz limpia y fácil de usar.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center p-4">
+                        <div class="feature-icon">
+                            <i class="bi bi-table"></i>
+                        </div>
+                        <h3>Gestión de Registros</h3>
+                        <p>Visualiza y filtra los registros de asistencia de manera intuitiva.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center p-4">
+                        <div class="feature-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h3>Gestión de Empleados</h3>
+                        <p>Añade, edita o da de baja empleados de forma sencilla y rápida.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center p-4">
+                        <div class="feature-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h3>Informes y Estadísticas</h3>
+                        <p>Genera informes detallados y visualiza estadísticas de asistencia.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center p-4">
+                        <div class="feature-icon">
+                            <i class="bi bi-file-earmark-pdf"></i>
+                        </div>
+                        <h3>Exportación a Excel</h3>
+                        <p>Exporta los datos a Excel para su análisis o procesado.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center p-4">
+                        <div class="feature-icon">
+                            <i class="bi bi-gear"></i>
+                        </div>
+                        <h3>Ajustes</h3>
+                        <p>Cambia los ajustes predeterminados de QueryManager y Loginmanager</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Precios -->
+    <section id="planes" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Planes</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 pricing-card">
+                        <div class="pricing-header">
+                            <h3>Básico</h3>
+                            <div class="price">20€<span class="price-period">/único pago</span></div>
+                            <p>Licencia estándar</p>
+                        </div>
+                        <div class="pricing-features">
+                            <ul>
+                                <li>Exportación de registros a Excel</li>
+                                <li>Informes mensuales para cada trabajador</li>
+                                <li>Gestión de empleados</li>
+                                <li>Un año de soporte</li>
+                                <li>Actualizaciones durante 6 meses</li>
+                            </ul>
+                            <a href="#contacto" class="btn btn-outline-primary w-100 mt-3">Solicitar</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 pricing-card border-primary">
+                        <div class="pricing-header bg-primary">
+                            <h3>Permanente</h3>
+                            <div class="price">140€<span class="price-period">/único pago</span></div>
+                            <p>Licencia de por vida</p>
+                        </div>
+                        <div class="pricing-features">
+                            <ul>
+                                <li>Todo lo que ofrece el plan básico</li>
+                                <li>Soporte prioritario</li>
+                                <li>Todas las actualizaciones futuras</li>
+                                <li>Asistencia remota y presencial</li>
+                                
+                            </ul>
+                            <a href="#contacto" class="btn btn-outline-primary w-100 mt-3">Solicitar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p class="text-muted">¿Necesitas una solución personalizada? <a href="#contacto">Contáctanos</a> para un presupuesto a medida sin compromiso.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Preguntas frecuentes -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Preguntas Frecuentes</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item mb-3 border-0 shadow-sm">
+                            <h3 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    ¿Necesito tener instalado LoginManager para usar QueryManager?
+                                </button>
+                            </h3>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Sí, QueryManager es un complemento de LoginManager que requiere tener instalado el software base para funcionar correctamente. QueryManager se conecta a la misma base de datos que LoginManager para ofrecer funciones de gestión avanzada.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item mb-3 border-0 shadow-sm">
+                            <h3 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    ¿Qué incluye el precio de la licencia?
+                                </button>
+                            </h3>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    El precio de la licencia incluye el software completo, actualizaciones durante el período de soporte contratado y asistencia técnica por correo electrónico. Los precios mostrados son de pago único, no hay cuotas recurrentes. La licencia es perpetua, pero las actualizaciones y el soporte están limitados al período contratado.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item mb-3 border-0 shadow-sm">
+                            <h3 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    ¿Hay soporte técnico?
+                                </button>
+                            </h3>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Sí, ofrecemos diferentes niveles de soporte según el plan contratado. El soporte básico incluye asistencia por correo electrónico, mientras que el plan permanente incluye soporte prioritario y asistencia remota. También ofrecemos servicios de instalación y configuración por un precio adicional.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item mb-3 border-0 shadow-sm">
+                            <h3 class="accordion-header" id="headingFour">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                    ¿Puedo probar QueryManager antes de comprarlo?
+                                </button>
+                            </h3>
+                            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Actualmente no ofrecemos una versión de prueba de QueryManager, pero puedes solicitar una demostración en vivo donde te mostraremos todas sus funcionalidades. También ofrecemos una garantía de devolución de 14 días si el software no cumple con tus expectativas.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item mb-3 border-0 shadow-sm">
+                            <h3 class="accordion-header" id="headingFive">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                    ¿Puedo seguir usando QueryManager después de finalizar el soporte del plan básico?
+                                </button>
+                            </h3>
+                            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Mientras no rompas el EULA de QueryManager, puedes seguir utilizándolo sin ningún problema. Únicamente dejarás de recibir actualizaciones y soporte técnico.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacto -->
+    <section id="contacto" class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h2 class="mb-4">¿Listo para mejorar tu gestión de personal?</h2>
+                    <p class="lead mb-5">Contáctanos para más información sobre QueryManager.</p>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="p-4 bg-light rounded">
+                                <i class="bi bi-envelope h1 text-primary mb-3"></i>
+                                <h4>Correo Electrónico</h4>
+                                <p class="mb-0">
+                                    <a href="mailto:RocketSmash@proton.me">RocketSmash@proton.me</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-4 bg-light rounded">
+                                <i class="bi bi-github h1 text-primary mb-3"></i>
+                                <h4>GitHub</h4>
+                                <p class="mb-0">
+                                    <a href="https://github.com/RocketSmash9000" target="_blank">@RocketSmash9000</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-4 bg-light rounded">
+                                <i class="bi bi-question-circle h1 text-primary mb-3"></i>
+                                <h4>Soporte</h4>
+                                <p class="mb-0">
+                                    <a href="https://github.com/RocketSmash9000/LoginManager/issues" target="_blank">Abrir incidencia</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pie de página -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>QueryManager</h5>
+                    <p class="mb-0">Herramienta profesional para la gestión avanzada de registros de asistencia.</p>
+                </div>
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                    <p class="mb-0">&copy; 2025 QueryManager. Todos los derechos reservados.</p>
+                    <p class="small mb-0">Un producto de <a href="index.html" class="text-white">LoginManager</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
