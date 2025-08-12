@@ -1,4 +1,7 @@
 # LoginManager
+
+**Para una mejor experiencia, visita la [página web](https://rocketsmash9000.github.io/LoginManager/).**
+
 ## ¿Qué es?
 LoginManager es un pequeño programa creado para permitir a cualquier persona mantener un seguimiento de sus trabajadores. De esta forma, pueden saber cuándo entran y cuándo salen del trabajo.
 
@@ -33,7 +36,7 @@ LoginManager puede usarse en un servidor Linux, pero dado que hay muchas formas 
 
 ## Servicios opcionales
 ### QueryManager
-LoginManager no implementa una interfaz para administrar y organizar las entradas y salidas, con lo cual es necesario usar la línea de comandos de MySQL o su interfaz gráfica. Como alternativa, existe QueryManager, el cual permite ver las entradas y salidas de los trabajadores, filtrar por días y trabajador, y administrar y añadir nuevos trabajadores. Esta aplicación es de código cerrado y de pago, con lo cual es necesario contactar conmigo ([@RocketSmash9000](https://github.com/RocketSmash9000)) a través de correo elecrónico (RocketSmash@proton.me) para discutir su precio. El pago es único y garantiza acceso a la versión más reciente a la hora del pago, sus versiones posteriores y asistencia durante un año.
+LoginManager no implementa una interfaz para administrar y organizar las entradas y salidas, con lo cual es necesario usar la línea de comandos de MySQL o su interfaz gráfica. Como alternativa, existe QueryManager, el cual permite ver las entradas y salidas de los trabajadores, filtrar por días y trabajador, y administrar y añadir nuevos trabajadores. Esta aplicación es de código cerrado y de pago, con lo cual es necesario contactar conmigo ([@RocketSmash9000](https://github.com/RocketSmash9000)) a través de correo elecrónico (RocketSmash@proton.me).
 
 ### Instalación
 En caso de no querer instalar LoginManager (o QueryManager, o los dos) de forma manual, yo ([@RocketSmash9000](https://github.com/RocketSmash9000)) ofrezco su instalación. En caso de ser de interés, será necesario contactar conmigo a través de correo electrónico (RocketSmash@proton.me).
