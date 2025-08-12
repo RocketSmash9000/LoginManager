@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoginManager - Gestión de Horarios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">LoginManager</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#caracteristicas">Características</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#como-funciona">¿Cómo funciona?</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#requisitos">Requisitos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#descargar">Descargar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-light py-5">
+        <div class="container text-center">
+            <div class="hero-content">
+                <span class="badge bg-primary mb-3">SOLUCIÓN PROFESIONAL</span>
+                <h1 class="display-4 fw-bold mb-3">
+                    <span class="text-primary">LoginManager</span>
+                </h1>
+                <div class="hero-subtitle">
+                    <p class="lead mb-4">La solución definitiva para el control de asistencia y cumplimiento normativo</p>
+                    <p class="text-muted">Cumple con los requisitos del Ministerio de Trabajo de España</p>
+                </div>
+                <div class="hero-buttons mt-4">
+                    <a href="#descargar" class="btn btn-primary btn-lg me-3">
+                        <i class="bi bi-download"></i> Descargar Ahora
+                    </a>
+                    <a href="#caracteristicas" class="btn btn-outline-secondary btn-lg">
+                        <i class="bi bi-info-circle"></i> Más información
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Características -->
+    <section id="caracteristicas" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Características Principales</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-laptop text-primary" style="font-size: 2.5rem;"></i>
+                            <h3 class="h4 mt-3">Interfaz Web</h3>
+                            <p>Accede desde cualquier dispositivo en tu red local con un navegador web moderno.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shield-lock text-primary" style="font-size: 2.5rem;"></i>
+                            <h3 class="h4 mt-3">Acceso Seguro</h3>
+                            <p>Autenticación por DNI y contraseña para garantizar la seguridad de los registros.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-database text-primary" style="font-size: 2.5rem;"></i>
+                            <h3 class="h4 mt-3">Base de Datos SQL</h3>
+                            <p>Almacenamiento confiable y organizado de todos los registros de asistencia.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cómo funciona -->
+    <section id="como-funciona" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">¿Cómo Funciona?</h2>
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h4>Registro de Empleados</h4>
+                        <p>Los empleados se registran una sola vez con su DNI y contraseña.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h4>Registro de Entrada/Salida</h4>
+                        <p>Los empleados inician sesión para registrar su entrada o salida con un solo clic.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h4>Consulta de registros</h4>
+                        <p>Los trabajadores pueden consultar todos sus registros de asistencia usando sus credenciales.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <img src="img/demoImg.png" alt="Captura de pantalla de LoginManager" class="img-fluid rounded shadow">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Requisitos -->
+    <section id="requisitos" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Requisitos del Sistema</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-windows me-3 text-primary"></i>
+                            <div>
+                                <h5 class="mb-0">Windows</h5>
+                                <p class="mb-0 text-muted">Sistema operativo recomendado (Linux disponible a través de Wine sin soporte oficial)</p>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-cup-hot me-3 text-primary"></i>
+                            <div>
+                                <h5 class="mb-0">Java 21</h5>
+                                <p class="mb-0 text-muted">Recomendamos usar la versión de <a href="https://adoptium.net/es/temurin/releases?version=21" target="_blank">Eclipse Adoptium</a></p>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-database me-3 text-primary"></i>
+                            <div>
+                                <h5 class="mb-0">MySQL</h5>
+                                <p class="mb-0 text-muted">Para el almacenamiento de datos</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Descargar -->
+    <section id="descargar" class="py-5 bg-light">
+        <div class="container text-center">
+            <h2 class="mb-4">Descargar LoginManager</h2>
+            <p class="lead mb-5">Descarga la última versión estable de LoginManager</p>
+            <a href="https://github.com/RocketSmash9000/LoginManager/releases/latest" class="btn btn-primary btn-lg me-3 mb-3">
+                <i class="bi bi-download"></i> Descargar Última Versión
+            </a>
+            <a href="https://github.com/RocketSmash9000/LoginManager" class="btn btn-outline-secondary btn-lg mb-3" target="_blank">
+                <i class="bi bi-github"></i> Ver en GitHub
+            </a>
+            <div class="mt-4">
+                <p class="text-muted">¿Necesitas ayuda con la instalación? <a href="#contacto">Contáctanos</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Servicios Adicionales -->
+    <section id="servicios" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Servicios Adicionales</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-gear text-primary" style="font-size: 2.5rem;"></i>
+                            <h3 class="h4 mt-3">QueryManager</h3>
+                            <p>Interfaz avanzada para la gestión de registros y empleados.</p>
+                            <p><small class="text-muted">Software de pago - Contáctanos para más información</small></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-tools text-primary" style="font-size: 2.5rem;"></i>
+                            <h3 class="h4 mt-3">Instalación</h3>
+                            <p>¿No quieres lidiar con la instalación? Nosotros lo hacemos por ti.</p>
+                            <p><small class="text-muted">Servicio de pago</small></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-puzzle text-primary" style="font-size: 2.5rem;"></i>
+                            <h3 class="h4 mt-3">Personalización</h3>
+                            <p>¿Necesitas funciones adicionales? Podemos adaptar el software a tus necesidades.</p>
+                            <p><small class="text-muted">Servicio personalizado - Presupuesto sin compromiso</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacto -->
+    <section id="contacto" class="py-5 bg-light">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center">
+                    <h2 class="mb-4">¿Tienes alguna pregunta?</h2>
+                    <p class="lead mb-4">Estamos aquí para ayudarte con cualquier duda o consulta.</p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="mailto:RocketSmash@proton.me" class="btn btn-outline-primary">
+                            <i class="bi bi-envelope"></i> Enviar Correo
+                        </a>
+                        <a href="https://github.com/RocketSmash9000/LoginManager/issues" class="btn btn-outline-secondary" target="_blank">
+                            <i class="bi bi-github"></i> Reportar un Problema
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pie de página -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>LoginManager</h5>
+                    <p class="mb-0">Solución sencilla para el control de horarios de empleados.</p>
+                </div>
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                    <p class="mb-0">&copy; 2025 LoginManager. Todos los derechos reservados.</p>
+                    <p class="small mb-0">Desarrollado por <a href="https://github.com/RocketSmash9000" class="text-white">RocketSmash9000</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

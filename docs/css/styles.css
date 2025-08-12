@@ -1,0 +1,263 @@
+/* Estilos generales */
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    padding-top: 56px; /* Para la barra de navegación fija */
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+section {
+    padding: 5rem 0;
+}
+
+/* Barra de navegación */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1030;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+/* Hero Section */
+header {
+    padding: 8rem 0 7rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-content .badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    letter-spacing: 1px;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 50px;
+    box-shadow: 0 4px 6px rgba(13, 110, 253, 0.15);
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(90deg, #212529 0%, #0d6efd 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+
+.hero-content .text-primary {
+    background: linear-gradient(90deg, #0d6efd 0%, #0dcaf0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+
+.hero-subtitle {
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
+
+.hero-subtitle .lead {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #495057;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.hero-buttons .btn {
+    min-width: 180px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.hero-buttons .btn i {
+    margin-right: 8px;
+}
+
+/* Asegurar que el primer elemento después del header no quede oculto */
+#caracteristicas {
+    scroll-margin-top: 80px; /* Altura de la barra de navegación + espacio extra */
+}
+
+/* Tarjetas de características */
+.card {
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Pasos */
+.step {
+    position: relative;
+    padding-left: 4rem;
+    margin-bottom: 2.5rem;
+}
+
+.step-number {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3rem;
+    height: 3rem;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+/* Lista de requisitos */
+.list-group-item {
+    border: none;
+    border-left: 4px solid var(--primary-color);
+    margin-bottom: 1rem;
+    border-radius: 0.25rem !important;
+    transition: transform 0.2s ease;
+}
+
+.list-group-item:hover {
+    transform: translateX(5px);
+}
+
+.list-group-item i {
+    font-size: 1.5rem;
+}
+
+/* Botones */
+.btn {
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.25);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Sección de contacto */
+#contacto {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* Pie de página */
+footer {
+    background-color: var(--dark-color);
+    padding: 2rem 0;
+}
+
+footer a {
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Efectos de desplazamiento suave */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    section {
+        padding: 3rem 0;
+    }
+    
+    .step {
+        padding-left: 3.5rem;
+    }
+    
+    .step-number {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1rem;
+    }
+    
+    .hero-content h1 {
+        font-size: 2.5rem !important;
+    }
+    
+    .hero-subtitle .lead {
+        font-size: 1.25rem !important;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .hero-buttons .btn {
+        width: 100%;
+        max-width: 280px;
+    }
+}
