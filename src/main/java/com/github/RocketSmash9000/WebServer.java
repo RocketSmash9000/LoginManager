@@ -4,7 +4,12 @@ import com.github.RocketSmash9000.config.Config;
 import com.github.RocketSmash9000.util.Logger;
 import org.fusesource.jansi.AnsiConsole;
 
+import java.io.Console;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static java.lang.System.exit;
 import static spark.Spark.*;
@@ -12,8 +17,60 @@ import static spark.Spark.*;
 public class WebServer {
 	static boolean credFileExists;
 	private static boolean logLevelChanged = false;
+
+	/**
+	 * Checks if the program is running in a console and opens one if needed.
+	 * @return true if running in a console or if a new console was successfully opened, false otherwise
+	 */
+	@SuppressWarnings({"t"})
+	private static boolean ensureConsole() {
+		// Try to get the console
+		Console console = System.console();
+
+		// If we have a console, we're good to go
+		if (console != null) {
+			return true;
+		}
+
+		// No console, try to open one
+		try {
+			String javaHome = System.getProperty("java.home");
+			String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
+			String classpath = System.getProperty("java.class.path");
+			String className = WebServer.class.getCanonicalName();
+
+			// Build the command to start a new console with the same classpath
+			List<String> command = new ArrayList<>();
+			command.add("cmd");
+			command.add("/c");
+			command.add("start");
+			command.add("\"QueryManager\"");
+			command.add(javaBin);
+			command.add("-cp");
+			command.add(classpath);
+			command.add(className);
+
+			// Add original arguments
+			command.addAll(Arrays.asList(System.getProperty("sun.java.command").split("\\s+")));
+
+			// Start the new process
+			new ProcessBuilder()
+					.command(command)
+					.inheritIO()
+					.start();
+
+			return false; // Original process should exit
+		} catch (Exception e) {
+			// If we can't open a new console, at least show an error dialog
+			System.err.println("No se pudo abrir una consola: " + e.getMessage());
+			return false;
+		}
+	}
+
 	@SuppressWarnings({"t", "D"})
 	public static void main(String[] args) {
+		// Intenta que la consola use caracteres especiales
+		System.setOut(new java.io.PrintStream(System.out, true, StandardCharsets.UTF_8));
 		System.setProperty("jansi.passthrough", "true");
 		AnsiConsole.systemInstall();
 		Config.set("Storage.baseDir",System.getenv("APPDATA") + "\\AnyManager");
@@ -23,25 +80,63 @@ public class WebServer {
 		Config.set("System.loginLast", userDirectory);
 
 		final int LOG_LEVEL = Config.getInt("Logger.logLevel", 1);
+		boolean debug = false;
 
 		for (String v : args) {
-			// Obtiene la versión del programa
-			if (v.equals("-v") || v.equals("--version")) {
-				String version = Version.getVersion();
-				System.out.println("Versión: " + (version != null ? version : "Desarrollo"));
-				exit(0);
-			}
+			// Muestra ayuda y comandos.
+			switch (v) {
+				case "-h", "--help" -> {
+					System.out.println("""
+							Modo de uso: java -jar QueryManager.jar [argumentos]
+							
+							Argumentos opcionales:
+							-v, --version -> Muestra la versión.
+							-p, --port    -> Muestra el puerto por el que conectarse a la interfaz web.
+							-a, --all     -> Muestra toda la información posible al ejecutar QueryManager.
+							-n, -none     -> Solo muestra errores fatales en la consola al ejecutar.
+							-h, --help    -> Muestra esto en la consola.
+							-d, --debug   -> Cambia el nivel de logs a DEBUG e impide la aparición de consolas. Sin uso fuera de un IDE
+							--erase       -> Borra las credenciales. Necesita autenticación para borrar.
+							--delete-all  -> Borra cualquier presencia que las herramientas AnyManager tuvieron en el disco duro.
+											 Es básicamente el último recurso si nada va bien. Necesita autenticación.
+							
+							Dejar opciones en blanco para ejecutar en modo normal.
+							""");
+					exit(0);
+				}
 
-			// Imprime todos los logs durante una sola ejecución
-			if (v.equals("-a") || v.equals("--all")) {
-				Config.setInt("Logger.logLevel", 0);
-				logLevelChanged = true;
-			}
+				// Obtiene la versión del programa
+				case "-v", "--version" -> {
+					String version = Version.getVersion();
+					System.out.println("Versión: " + (version != null ? version : "Desarrollo"));
+					exit(0);
+				}
 
-			// Durante una sola ejecución, solo imprimirá logs de nivel 4
-			if (v.equals("-n") || v.equals("--none")) {
-				Config.setInt("Logger.logLevel", 4);
-				logLevelChanged = true;
+				// Imprime todos los logs durante una sola ejecución
+				case "-a", "--all" -> {
+					Config.setInt("Logger.logLevel", 0);
+					logLevelChanged = true;
+				}
+
+				// Durante una sola ejecución, solo imprimirá logs de nivel 4
+				case "-n", "--none" -> {
+					Config.setInt("Logger.logLevel", 4);
+					logLevelChanged = true;
+				}
+
+				case "-d", "--debug" -> {
+					Config.setInt("Logger.logLevel", 0);
+					logLevelChanged = true;
+					debug = true;
+				}
+			}
+		}
+
+		// If we're not debugging...
+		if (!debug) {
+			// Ensure we're running in a console
+			if (!ensureConsole()) {
+				exit(0); // Exit the original process if we're starting a new console
 			}
 		}
 
