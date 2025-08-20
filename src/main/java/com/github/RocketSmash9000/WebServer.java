@@ -194,6 +194,12 @@ public class WebServer {
 			return null;
 		});
 
+		// Handle favicon.ico requests
+		get("/favicon.ico", (req, res) -> {
+			res.redirect("/LoginManager.png");
+			return null;
+		});
+
 		// Enable CORS
 		options("/*", (request, response) -> {
 			String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
@@ -240,6 +246,8 @@ public class WebServer {
 							res.status(500);
 							return "Error al registrar el nuevo usuario";
 						}
+						// Después de registrar un nuevo usuario, no intentamos registrar entrada/salida
+						return "Usuario registrado exitosamente. Por favor, inicie sesión nuevamente para registrar su entrada/salida.";
 					case 3:
 						res.status(500);
 						return "No se pudieron leer las credenciales";
@@ -282,6 +290,8 @@ public class WebServer {
 							res.status(500);
 							return "Error al registrar el nuevo usuario";
 						}
+						// Después de registrar un nuevo usuario, no intentamos registrar entrada/salida
+						return "Usuario registrado exitosamente. Por favor, inicie sesión nuevamente para registrar su entrada/salida.";
 					case 3:
 						res.status(500);
 						return "No se pudieron leer las credenciales";

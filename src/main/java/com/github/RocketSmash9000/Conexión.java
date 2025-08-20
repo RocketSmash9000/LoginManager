@@ -80,35 +80,52 @@ public class Conexión {
 	public static int insertarEntrada(String dni, String observaciones) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection co= getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
-			String sql = "INSERT INTO RegistroHorario (dni, fecha, hora_entrada, observaciones) VALUES (?, ?, ?, ?)";
-			try (PreparedStatement pstmt = co.prepareStatement(sql)) {
-				LocalDate fecha = LocalDate.now();       // Fecha actual
-				LocalTime horaEntrada = LocalTime.now(); // Hora actual
+			try (Connection conn = getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass)) {
+				// Verificar si hay un registro del día actual con solo hora de salida
+				boolean registroActualizado = false;
+				try (ResultSet rs = obtenerUltimoRegistroHoy(conn, dni)) {
+					if (rs.next()) {
+						Time horaSalida = rs.getTime("hora_salida");
+						Time horaEntrada = rs.getTime("hora_entrada");
+						
+						// Si hay un registro con hora de salida pero sin hora de entrada, actualizamos
+						if (horaSalida != null && horaEntrada == null) {
+							String sql = "UPDATE RegistroHorario SET hora_entrada = ? WHERE id = ?";
+							try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+								pstmt.setTime(1, Time.valueOf(LocalTime.now()));
+								pstmt.setInt(2, rs.getInt("id"));
+								pstmt.executeUpdate();
+								registroActualizado = true;
+							}
+						}
+					}
+				}
+				
+				// Si no se actualizó ningún registro, creamos uno nuevo
+				if (!registroActualizado) {
+					String sql = "INSERT INTO RegistroHorario (dni, fecha, hora_entrada, observaciones) VALUES (?, CURDATE(), ?, ?)";
+					try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+						pstmt.setString(1, dni);
+						pstmt.setTime(2, Time.valueOf(LocalTime.now()));
+						pstmt.setString(3, observaciones);
+						pstmt.executeUpdate();
+					}
+				}
 
-				pstmt.setString(1, dni);
-				pstmt.setDate(2, Date.valueOf(fecha));
-				pstmt.setTime(3, Time.valueOf(horaEntrada));
-				pstmt.setString(4, observaciones);
-
-				pstmt.executeUpdate();
-			}
-
-			sql = "UPDATE Empleados SET activo = TRUE WHERE dni = ?";
-
-			try (Connection conn = getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
-			     PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-				stmt.setString(1, dni);
-				int rowsAffected = stmt.executeUpdate();
-				Logger.debug("Se activaron " + rowsAffected + " trabajadores.");
+				// Actualizar el estado del empleado a activo
+				String sql = "UPDATE Empleados SET activo = TRUE WHERE dni = ?";
+				try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+					stmt.setString(1, dni);
+					int rowsAffected = stmt.executeUpdate();
+					Logger.debug("Se activaron " + rowsAffected + " trabajadores.");
+				}
 
 			} catch (SQLException e) {
 				Logger.error("Algo falló: " + e.getMessage());
 				Logger.debug(Arrays.toString(e.getStackTrace()));
 			}
 
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (ClassNotFoundException e) {
 			Logger.error("Ha ocurrido un problema al insertar la entrada: " + e.getMessage());
 			Logger.debug(Arrays.toString(e.getStackTrace()));
 			return 1;
@@ -120,35 +137,53 @@ public class Conexión {
 	public static int insertarSalida(String dni, String observaciones) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection co= getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
-			String sql = "INSERT INTO RegistroHorario (dni, fecha, hora_salida, observaciones) VALUES (?, ?, ?, ?)";
-			try (PreparedStatement pstmt = co.prepareStatement(sql)) {
-				LocalDate fecha = LocalDate.now();       // Fecha actual
-				LocalTime horaSalida = LocalTime.now(); // Hora actual
+			try (Connection conn = getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass)) {
+				// Verificar si hay un registro del día actual con solo hora de entrada
+				boolean registroActualizado = false;
+				try (ResultSet rs = obtenerUltimoRegistroHoy(conn, dni)) {
+					if (rs.next()) {
+						Time horaEntrada = rs.getTime("hora_entrada");
+						Time horaSalida = rs.getTime("hora_salida");
+						
+						// Si hay un registro con hora de entrada pero sin hora de salida, actualizamos
+						if (horaEntrada != null && horaSalida == null) {
+							String sql = "UPDATE RegistroHorario SET hora_salida = ?, observaciones = ? WHERE id = ?";
+							try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+								pstmt.setTime(1, Time.valueOf(LocalTime.now()));
+								pstmt.setString(2, observaciones);
+								pstmt.setInt(3, rs.getInt("id"));
+								pstmt.executeUpdate();
+								registroActualizado = true;
+							}
+						}
+					}
+				}
+				
+				// Si no se actualizó ningún registro, creamos uno nuevo
+				if (!registroActualizado) {
+					String sql = "INSERT INTO RegistroHorario (dni, fecha, hora_salida, observaciones) VALUES (?, CURDATE(), ?, ?)";
+					try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+						pstmt.setString(1, dni);
+						pstmt.setTime(2, Time.valueOf(LocalTime.now()));
+						pstmt.setString(3, observaciones);
+						pstmt.executeUpdate();
+					}
+				}
 
-				pstmt.setString(1, dni);
-				pstmt.setDate(2, Date.valueOf(fecha));
-				pstmt.setTime(3, Time.valueOf(horaSalida));
-				pstmt.setString(4, observaciones);
-
-				pstmt.executeUpdate();
-			}
-
-			sql = "UPDATE Empleados SET activo = FALSE WHERE dni = ?";
-
-			try (Connection conn = getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass);
-			     PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-				stmt.setString(1, dni);
-				int rowsAffected = stmt.executeUpdate();
-				Logger.debug("Se desactivaron " + rowsAffected + " trabajadores.");
+				// Actualizar el estado del empleado a inactivo
+				String sql = "UPDATE Empleados SET activo = FALSE WHERE dni = ?";
+				try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+					stmt.setString(1, dni);
+					int rowsAffected = stmt.executeUpdate();
+					Logger.debug("Se desactivaron " + rowsAffected + " trabajadores.");
+				}
 
 			} catch (SQLException e) {
 				Logger.error("Algo falló: " + e.getMessage());
 				Logger.debug(Arrays.toString(e.getStackTrace()));
 			}
 
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (ClassNotFoundException e) {
 			Logger.error("Ha ocurrido un problema al insertar la salida: " + e.getMessage());
 			Logger.debug(Arrays.toString(e.getStackTrace()));
 			return 1;
@@ -207,5 +242,21 @@ public class Conexión {
 			Logger.debug(Arrays.toString(e.getStackTrace()));
 			return "[]";
 		}
+	}
+	
+	/**
+	 * Obtiene el último registro de un usuario para la fecha actual
+	 * @param dni El DNI del usuario
+	 * @return Un ResultSet con el último registro del día actual, o null si no hay registros
+	 * @throws SQLException Si ocurre un error al consultar la base de datos
+	 */
+	private static ResultSet obtenerUltimoRegistroHoy(Connection conn, String dni) throws SQLException {
+		String sql = "SELECT * FROM RegistroHorario " +
+				"WHERE dni = ? AND fecha = CURDATE() " +
+				"ORDER BY id DESC LIMIT 1";
+		
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, dni);
+		return pstmt.executeQuery();
 	}
 }

@@ -7,7 +7,8 @@ public class Checker {
 	public static boolean validDNI(String dni) {
 		if (dni.length() != 9)
 			return false;
-		for (int i = 0; i < dni.length(); i++){
+		// Ignoramos el primer número para permitir DNIs extrangeros
+		for (int i = 1; i < dni.length(); i++){
 			if ((i < 8) && !isDigit(dni.charAt(i)))
 				return false;
 			if (i == 8 && isLetter(dni.charAt(i)))

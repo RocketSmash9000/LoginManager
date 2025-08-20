@@ -20,7 +20,7 @@ public class Login {
 	 * @param pass la contraseña de la persona.
 	 * @return 0 si existe el usuario y la contraseña es válida, 1 si el usuario existe pero la contraseña es inválida, 2 si no existe el ususario y 3 si algo salió mal.
 	 */
-	@SuppressWarnings("t")
+	@SuppressWarnings("D")
 	public static int validarUsuario(String dni, String pass) {
 		String appDataPath = System.getenv("APPDATA");
 
