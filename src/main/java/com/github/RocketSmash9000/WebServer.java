@@ -3,6 +3,7 @@ package com.github.RocketSmash9000; // Make sure you have the correct package de
 import com.github.RocketSmash9000.config.Config;
 import com.github.RocketSmash9000.util.Logger;
 import org.fusesource.jansi.AnsiConsole;
+import spark.ssl.SslStores;
 
 import java.io.Console;
 import java.io.File;
@@ -196,9 +197,26 @@ public class WebServer {
 		}
 
 		// Configure Spark
+		// Set secure keystore
+		String keystorePath = WebServer.class.getClassLoader().getResource("security/keystore.p12").getPath();
+		keystorePath = keystorePath.replaceFirst("^/(.:/)", "$1"); // Fix Windows path issue
+		
+		// Configure HTTPS
+		secure(keystorePath, "changeit", null, null);
+		
+		// Set the HTTPS port
 		port(2048);
+
 		staticFiles.location("/public"); // Serve static files from resources/public
 		staticFiles.expireTime(600); // Cache static files for 10 minutes
+
+		// Configure HTTP to HTTPS redirect on port 80
+		// port(80);
+		before((request, response) -> {
+		    if (request.scheme().equals("http")) {
+		        response.redirect("https://" + request.host().replaceFirst(":\\d+", "") + ":2048" + request.pathInfo(), 301);
+		    }
+		});
 
 		// Add a route to serve the mis-registros.html file
 		get("/mis-registros", (req, res) -> {
