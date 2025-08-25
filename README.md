@@ -23,7 +23,7 @@ Solo hace falta poner el DNI y la contraseña, y alguna observación en caso de 
 ## Requisitos
 LoginManager necesita el siguiente software para poder funcionar:
 - Un dispositivo Windows donde funcionar.
-  - *Opcionalmente puede funcionar en Linux si se usa [Wine](https://www.winehq.org/). Su funcionamiento no está garantizado.*
+  - *Opcionalmente puede funcionar en Linux. Su funcionamiento no está garantizado.*
 - Java 21 (preferiblemente de [Eclipse Adoptium](https://adoptium.net/es/temurin/releases?version=21&os=any&arch=any)).
 - [MySQL](https://dev.mysql.com/).
 
@@ -32,7 +32,7 @@ LoginManager necesita el siguiente software para poder funcionar:
 Si bien las credenciales están cifradas para hacer más complicado el acceso a estas, el cifrado usado no es el más robusto del mercado. Sin embargo, el descifrado manual de las credenciales supone saber lo que se hace, con lo cual yo ([@RocketSmash9000](https://github.com/RocketSmash9000)) no me hago cargo de posibles errores al manipular indebidamente estos archivos.
 
 ### Soporte para Linux
-LoginManager puede usarse en un servidor Linux, pero dado que hay muchas formas de instalar paquetes y una gran cantidad de distribuciones, no todas tienen la misma forma de ejecutar MySQL. De esta forma, es altamente complicado crear un programa lo suficientemente robusto como para incluir todas y cada una de las formas de comprobar que MySQL está funcionando. Han habido intentos de crear una conexión con Linux, pero ha demostrado tomar más tiempo del que un único desarrollador puede dar. Es por esta razón que no habrá soporte oficial para Linux.
+A partir del commit [4c6dd08](https://github.com/RocketSmash9000/LoginManager/commit/4c6dd08efa1992fa31cdc3b09feb7a1be62febd8) hay soporte básico en Linux. No habrán comprobaciónes de que MySQL o el servicio elegido de SQL esté funcionando, además de que es altamente posible que ocurran errores de conexión por conectarse al puerto incorrecto o porque dicho servicio de SQL no funciona. En estos casos, es responsabilidad del usuario conseguir que el programa funcione dado que el sistema para el que fue diseñado es Windows.
 
 ## Servicios opcionales
 ### QueryManager
