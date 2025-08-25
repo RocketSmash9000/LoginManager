@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static com.github.RocketSmash9000.StartupManager.FILE_NAME;
-import static com.github.RocketSmash9000.StartupManager.FOLDER_NAME;
+import static com.github.RocketSmash9000.StartupManager.folderName;
 
 public class Login {
 
@@ -30,7 +30,7 @@ public class Login {
 			return 3;
 		}
 
-		File folder = new File(FOLDER_NAME);
+		File folder = new File(folderName);
 		File file = new File(folder, FILE_NAME);
 
 		if (!file.exists())
@@ -88,7 +88,7 @@ public class Login {
 			return false;
 		}
 
-		File folder = new File(FOLDER_NAME);
+		File folder = new File(folderName);
 		File file = new File(folder, FILE_NAME);
 
 		if (!file.exists()) {

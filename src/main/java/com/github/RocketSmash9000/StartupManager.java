@@ -16,28 +16,21 @@ import java.util.Scanner;
 import static java.lang.System.exit;
 
 public class StartupManager {
-    private static final String MYSQL_SERVICE_NAME = "MySQL"; // Default MySQL service name, change if different
-	// The name of your application's folder.
-	public static final String FOLDER_NAME = Config.CONFIG_DIR;
+    private static String MYSQL_SERVICE_NAME = "MySQL"; // Default MySQL service name, change if different
+	// The name of the application's folder.
+	public static String folderName;
 
-	// The name of the file you want to create.
+	// The name of the file to create.
 	public static final String FILE_NAME = "Credentials.txt";
 
 	public static String username;
 	public static String pass;
+	public static boolean noCheck = false;
 
 	public static boolean credFileExists(){
-		// 1. Get the AppData\Roaming folder path from the environment variable.
-		// The "APPDATA" environment variable typically points to C:\Users\{username}\AppData\Roaming
-		String appDataPath = System.getenv("APPDATA");
+		folderName = Config.configDir;
 
-		// Check if the APPDATA environment variable exists.
-		if (appDataPath == null || appDataPath.isEmpty()) {
-			Logger.warn("La variable de entorno APPDATA no fue encontrada. ¿Esto es Windows?");
-			return false;
-		}
-
-		File folder = new File(FOLDER_NAME);
+		File folder = new File(folderName);
 		File file = new File(folder, FILE_NAME);
 
 		return file.exists();
@@ -61,20 +54,10 @@ public class StartupManager {
 		String fileContent = username + "\n" + pass;
 
 		try {
-			// 1. Get the AppData\Roaming folder path from the environment variable.
-			// The "APPDATA" environment variable typically points to C:\Users\{username}\AppData\Roaming
-			String appDataPath = System.getenv("APPDATA");
+			// Create a File object for the application's subfolder.
+			File appFolder = new File(folderName);
 
-			// Check if the APPDATA environment variable exists.
-			if (appDataPath == null || appDataPath.isEmpty()) {
-				Logger.warn("La variable de entorno APPDATA no fue encontrada. ¿Esto es Windows?");
-				return;
-			}
-
-			// 2. Create a File object for your application's subfolder.
-			File appFolder = new File(FOLDER_NAME);
-
-			// 3. Create the directory if it does not exist.
+			// Create the directory if it does not exist.
 			// use mkdirs() to create parent directories if they don't exist.
 			if (!appFolder.exists()) {
 				boolean created = appFolder.mkdirs();
@@ -86,11 +69,11 @@ public class StartupManager {
 				}
 			}
 
-			// 4. Construct the full path to the file inside your application's folder.
+			// Construct the full path to the file inside the application's folder.
 			// This will create a path like: C:\Users\{username}\AppData\Roaming\MyApplication\MyTextFile.txt
 			File file = new File(appFolder, FILE_NAME);
 
-			// 5. Create the file and write content to it.
+			// Create the file and write content to it.
 			// We use a BufferedWriter for efficient writing.
 			// The try-with-resources statement ensures the writer is automatically closed.
 			try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -109,18 +92,13 @@ public class StartupManager {
 	} // The Scanner is automatically closed here by the try-with-resources statement
 
 	public static void startup() {
+		folderName = Config.configDir;
+
 		if (!mySQLStartup())
 			exit(1);
 		if (credFileExists()) {
-			String appDataPath = System.getenv("APPDATA");
 
-			// Check if the APPDATA environment variable exists.
-			if (appDataPath == null || appDataPath.isEmpty()) {
-				Logger.warn("La variable de entorno APPDATA no fue encontrada. ¿Esto es Windows?");
-				return;
-			}
-
-			File folder = new File(FOLDER_NAME);
+			File folder = new File(folderName);
 			File filePath = new File(folder, FILE_NAME);
 
 			File archivo = Cryptography.decrypt(filePath);
@@ -152,6 +130,10 @@ public class StartupManager {
      * @return true if the service is running or was successfully started, false otherwise
      */
     public static boolean mySQLStartup() {
+		if (noCheck) {
+			Logger.info("No vamos a comprobar si MySQL funciona. Pueden ocurrir errores.");
+			return true;
+		}
         try {
             // Check if the service is already running
             Process checkProcess = Runtime.getRuntime().exec("sc query " + MYSQL_SERVICE_NAME);
@@ -182,8 +164,56 @@ public class StartupManager {
                 }
             } else if (output.contains("FAILED 1060")) {
                 Logger.warn("MySQL no está instalado o el nombre del servicio es incorrecto.");
-	            Logger.info("Por favor, inicia MySQL manualmente si está instalado o contacta con el autor.");
-                return false;
+				Logger.info("Vamos a probar con otro nombre");
+
+				MYSQL_SERVICE_NAME = "MySQL80";
+				// A veces MySQL está instalado como MySQL80, así que comprobamos eso también por si acaso
+	            try {
+		            // Check if the service is already running
+		            checkProcess = Runtime.getRuntime().exec("sc query " + MYSQL_SERVICE_NAME);
+		            checkProcess.waitFor();
+
+		            // Read the output to check service status
+		            output = new String(checkProcess.getInputStream().readAllBytes());
+
+		            if (output.contains("RUNNING")) {
+			            Logger.debug("MySQL ya está funcionando.");
+			            return true;
+		            } else if (output.contains("STOPPED")) {
+			            Logger.info("MySQL está parado. Vamos a intentar iniciarlo...");
+
+			            // Try to start the service
+			            Process startProcess = Runtime.getRuntime().exec("net start " + MYSQL_SERVICE_NAME);
+			            int exitCode = startProcess.waitFor();
+
+			            if (exitCode == 0) {
+				            Logger.info("MySQL se pudo ejecutar exitosamente.");
+				            return true;
+			            } else {
+				            String error = new String(startProcess.getErrorStream().readAllBytes());
+				            Logger.error("No se pudo iniciar MySQL. Código de salida: " + exitCode);
+				            Logger.error("Error: " + error);
+				            Logger.info("Por favor, inicia MySQL manualmente o contacta con el autor.");
+				            return false;
+			            }
+		            } else if (output.contains("FAILED 1060")) {
+			            Logger.warn("MySQL no está instalado o el nombre del servicio es incorrecto.");
+			            Logger.info("Por favor, inicia MySQL manualmente si está instalado o contacta con el autor.");
+			            return false;
+		            } else {
+			            Logger.error("Ha ocurrido un problema inesperado: " + output);
+			            Logger.info("Contacta con el autor para resolver el problema.");
+			            return false;
+		            }
+	            } catch (IOException | InterruptedException e) {
+		            Logger.error("Hubo un error al comprobar el mensaje de retorno: " + e.getMessage());
+		            Logger.debug(Arrays.toString(e.getStackTrace()));
+		            Logger.info("Por favor, contacta con el autor.");
+		            if (e instanceof InterruptedException) {
+			            Thread.currentThread().interrupt();
+		            }
+		            return false;
+	            }
             } else {
                 Logger.error("Ha ocurrido un problema inesperado: " + output);
 	            Logger.info("Contacta con el autor para resolver el problema.");

@@ -73,7 +73,24 @@ public class WebServer {
 		System.setOut(new java.io.PrintStream(System.out, true, StandardCharsets.UTF_8));
 		System.setProperty("jansi.passthrough", "true");
 		AnsiConsole.systemInstall();
-		Config.set("Storage.baseDir",System.getenv("APPDATA") + "\\AnyManager");
+
+		String env = System.getenv("APPDATA");
+		// Si la variable de entorno no existe, estamos en Linux
+		if (env == null || env.isEmpty()) {
+			// En Linux se puede usar XDG_CONFIG_HOME o HOME/.config
+			String xdg = System.getenv("XDG_CONFIG_HOME");
+			if (xdg != null && !xdg.isEmpty()) {
+				env = xdg;
+			} else {
+				String home = System.getenv("HOME");
+				if (home != null && !home.isEmpty()) {
+					env = home + "/.config";
+				}
+			}
+		}
+
+		Config.configDir = env + "\\AnyManager";
+		Config.set("Storage.baseDir", env + "\\AnyManager");
 
 		// Guarda en la configuración el sitio donde se ha ejecutado LoginManager por última vez.
 		String userDirectory = new File("").getAbsolutePath();
@@ -90,15 +107,12 @@ public class WebServer {
 							Modo de uso: java -jar QueryManager.jar [argumentos]
 							
 							Argumentos opcionales:
-							-v, --version -> Muestra la versión.
-							-p, --port    -> Muestra el puerto por el que conectarse a la interfaz web.
-							-a, --all     -> Muestra toda la información posible al ejecutar QueryManager.
-							-n, -none     -> Solo muestra errores fatales en la consola al ejecutar.
-							-h, --help    -> Muestra esto en la consola.
-							-d, --debug   -> Cambia el nivel de logs a DEBUG e impide la aparición de consolas. Sin uso fuera de un IDE
-							--erase       -> Borra las credenciales. Necesita autenticación para borrar.
-							--delete-all  -> Borra cualquier presencia que las herramientas AnyManager tuvieron en el disco duro.
-											 Es básicamente el último recurso si nada va bien. Necesita autenticación.
+							-v, --version  -> Muestra la versión.
+							-a, --all      -> Muestra toda la información posible al ejecutar QueryManager.
+							-n, -none      -> Solo muestra errores fatales en la consola al ejecutar.
+							-h, --help     -> Muestra esto en la consola.
+							-d, --debug    -> Cambia el nivel de logs a DEBUG e impide la aparición de consolas. Sin uso fuera de un IDE
+							-N, --no-check -> No comprueba si MySQL está funcionando. Útil como capa de compatibilidad con Linux.
 							
 							Dejar opciones en blanco para ejecutar en modo normal.
 							""");
@@ -128,6 +142,10 @@ public class WebServer {
 					Config.setInt("Logger.logLevel", 0);
 					logLevelChanged = true;
 					debug = true;
+				}
+
+				case "-N", "--no-check" -> {
+					StartupManager.noCheck = true;
 				}
 			}
 		}

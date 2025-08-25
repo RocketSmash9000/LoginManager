@@ -16,8 +16,8 @@ import java.util.Properties;
  * en un archivo ubicado en el directorio de configuración del usuario.
  */
 public class Config {
-    public static final String CONFIG_DIR = System.getenv("APPDATA") + "\\AnyManager";
-    private static final String CONFIG_FILE = CONFIG_DIR + "\\user.cfg";
+    public static String configDir;
+    private static String configFile;
     private static final Properties props = new Properties();
     private static volatile boolean configuracionCargada = false;
     private static final Object lock = new Object();
@@ -38,11 +38,12 @@ public class Config {
      * Carga la configuración desde el archivo, o crea uno vacío si no existe.
      */
     private static void cargarConfiguracion() {
-        File configFile = new File(CONFIG_FILE);
+        configFile = configDir + "\\user.cfg";
+		File configFile = new File(Config.configFile);
 
         try {
             // Crear directorio si no existe
-            Files.createDirectories(Paths.get(CONFIG_DIR));
+            Files.createDirectories(Paths.get(configDir));
 
             if (configFile.exists()) {
                 try (FileInputStream fis = new FileInputStream(configFile)) {
@@ -63,9 +64,9 @@ public class Config {
      * Guarda la configuración actual en el archivo.
      */
     private static void guardarConfiguracion() {
-        try (FileOutputStream fos = new FileOutputStream(CONFIG_FILE)) {
+        try (FileOutputStream fos = new FileOutputStream(configFile)) {
             props.store(fos, "Configuración de la aplicación");
-            Logger.debug("Configuración guardada correctamente en " + CONFIG_FILE);
+            Logger.debug("Configuración guardada correctamente en " + configFile);
         } catch (IOException e) {
             Logger.error("Error al guardar la configuración: " + e);
         }
