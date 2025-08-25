@@ -43,3 +43,15 @@ En caso de no querer instalar LoginManager (o QueryManager, o los dos) de forma 
 
 ### Personalización
 En caso de necesitar funciones específicas que LoginManager o QueryManager no ofrecen, es posible contactar conmigo por correo electrónico (RocketSmash@proton.me) para cualquiera de los dos para que se adapten a todas las necesidades. Esta personalización deberá pagarse y su precio se verá alterado según la cantidad de cambios a realizar. Las versiones personalizadas son completamente privadas y no se publicarán en ninguna plataforma.
+
+## Build From Source
+Para construir la aplicación a partir del código fuente es necesario Maven.
+
+Antes de crear el archivo JAR, es necesario crear una clave SSL para habilitar HTTPS. Crea un nuevo directorio llamado `security` en `src/main/resources`. Una vez creado, usa los siguientes comandos (desde el directorio raíz):
+
+```
+cd src\main\resources\security
+keytool -genkeypair -alias loginmanager -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore keystore.p12 -validity 3650 -storepass changeit -keypass changeit -dname "CN=localhost, OU=Development, O=LoginManager, L=City, ST=State, C=ES"
+```
+
+Clona el repositorio, añade Maven al directorio (si fuera necesario) y usa el comando `mvn clean package`. Esto habrá creado un archivo JAR en el directorio `target` en la raíz del proyecto con un nombre similar a `LoginManager-1.x.y.jar`. Este archivo es el que se debe usar.
