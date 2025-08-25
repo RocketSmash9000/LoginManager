@@ -23,7 +23,7 @@ Solo hace falta poner el DNI y la contraseña, y alguna observación en caso de 
 ## Requisitos
 LoginManager necesita el siguiente software para poder funcionar:
 - Un dispositivo Windows donde funcionar.
-  - *Opcionalmente puede funcionar en Linux si se usa [Wine](https://www.winehq.org/). Su funcionamiento no está garantizado.*
+  - *Opcionalmente puede funcionar en Linux. Su funcionamiento no está garantizado.*
 - Java 21 (preferiblemente de [Eclipse Adoptium](https://adoptium.net/es/temurin/releases?version=21&os=any&arch=any)).
 - [MySQL](https://dev.mysql.com/).
 
@@ -32,7 +32,7 @@ LoginManager necesita el siguiente software para poder funcionar:
 Si bien las credenciales están cifradas para hacer más complicado el acceso a estas, el cifrado usado no es el más robusto del mercado. Sin embargo, el descifrado manual de las credenciales supone saber lo que se hace, con lo cual yo ([@RocketSmash9000](https://github.com/RocketSmash9000)) no me hago cargo de posibles errores al manipular indebidamente estos archivos.
 
 ### Soporte para Linux
-LoginManager puede usarse en un servidor Linux, pero dado que hay muchas formas de instalar paquetes y una gran cantidad de distribuciones, no todas tienen la misma forma de ejecutar MySQL. De esta forma, es altamente complicado crear un programa lo suficientemente robusto como para incluir todas y cada una de las formas de comprobar que MySQL está funcionando. Han habido intentos de crear una conexión con Linux, pero ha demostrado tomar más tiempo del que un único desarrollador puede dar. Es por esta razón que no habrá soporte oficial para Linux.
+A partir del commit [4c6dd08](https://github.com/RocketSmash9000/LoginManager/commit/4c6dd08efa1992fa31cdc3b09feb7a1be62febd8) hay soporte básico en Linux. No habrán comprobaciónes de que MySQL o el servicio elegido de SQL esté funcionando, además de que es altamente posible que ocurran errores de conexión por conectarse al puerto incorrecto o porque dicho servicio de SQL no funciona. En estos casos, es responsabilidad del usuario conseguir que el programa funcione dado que el sistema para el que fue diseñado es Windows.
 
 ## Servicios opcionales
 ### QueryManager
@@ -43,3 +43,15 @@ En caso de no querer instalar LoginManager (o QueryManager, o los dos) de forma 
 
 ### Personalización
 En caso de necesitar funciones específicas que LoginManager o QueryManager no ofrecen, es posible contactar conmigo por correo electrónico (RocketSmash@proton.me) para cualquiera de los dos para que se adapten a todas las necesidades. Esta personalización deberá pagarse y su precio se verá alterado según la cantidad de cambios a realizar. Las versiones personalizadas son completamente privadas y no se publicarán en ninguna plataforma.
+
+## Build From Source
+Para construir la aplicación a partir del código fuente es necesario Maven.
+
+Antes de crear el archivo JAR, es necesario crear una clave SSL para habilitar HTTPS. Crea un nuevo directorio llamado `security` en `src/main/resources`. Una vez creado, usa los siguientes comandos (desde el directorio raíz):
+
+```
+cd src\main\resources\security
+keytool -genkeypair -alias loginmanager -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore keystore.p12 -validity 3650 -storepass changeit -keypass changeit -dname "CN=localhost, OU=Development, O=LoginManager, L=City, ST=State, C=ES"
+```
+
+Clona el repositorio, añade Maven al directorio (si fuera necesario) y usa el comando `mvn clean package`. Esto habrá creado un archivo JAR en el directorio `target` en la raíz del proyecto con un nombre similar a `LoginManager-1.x.y.jar`. Este archivo es el que se debe usar.
