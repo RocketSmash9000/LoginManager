@@ -16,9 +16,14 @@ public class Login {
 
 	/**
 	 *
-	 * @param dni el DNI de la persona.
-	 * @param pass la contraseña de la persona.
-	 * @return 0 si existe el usuario y la contraseña es válida, 1 si el usuario existe pero la contraseña es inválida, 2 si no existe el ususario y 3 si algo salió mal.
+	 * @param dni that person's DNI.
+	 * @param pass the password.
+	 * @return <ul>
+	 * <li> 0 si existe el usuario y la contraseña es válida
+	 * <li> 1 si el usuario existe pero la contraseña es inválida
+	 * <li> 2 si no existe el ususario
+	 * <li> 3 si algo salió mal.
+	 * </ul>
 	 */
 	@SuppressWarnings("D")
 	public static int validarUsuario(String dni, String pass) {
@@ -77,8 +82,17 @@ public class Login {
 		return 2;
 	}
 
+	/**
+	 * Adds a new user to the system.
+	 * @param dni the DNI of the worker to register.
+	 * @param contraseña the password for that user.
+	 * @return <ul>
+	 * <li> true if the user was added successfully.
+	 * <li> false if the user couldn't be added.
+	 * </ul>
+	 */
 	public static boolean añadirUsuario(String dni, String contraseña) {
-		// 1. Get the AppData\Roaming folder path from the environment variable.
+		// Get the AppData\Roaming folder path from the environment variable.
 		// The "APPDATA" environment variable typically points to C:\Users\{username}\AppData\Roaming
 		String appDataPath = System.getenv("APPDATA");
 

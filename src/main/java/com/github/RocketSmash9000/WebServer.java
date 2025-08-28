@@ -3,7 +3,6 @@ package com.github.RocketSmash9000; // Make sure you have the correct package de
 import com.github.RocketSmash9000.config.Config;
 import com.github.RocketSmash9000.util.Logger;
 import org.fusesource.jansi.AnsiConsole;
-import spark.ssl.SslStores;
 
 import java.io.Console;
 import java.io.File;
@@ -11,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static java.lang.System.exit;
 import static spark.Spark.*;
@@ -70,15 +70,15 @@ public class WebServer {
 
 	@SuppressWarnings({"t", "D"})
 	public static void main(String[] args) {
-		// Intenta que la consola use caracteres especiales
+		// Try to make console use special characters
 		System.setOut(new java.io.PrintStream(System.out, true, StandardCharsets.UTF_8));
 		System.setProperty("jansi.passthrough", "true");
 		AnsiConsole.systemInstall();
 
 		String env = System.getenv("APPDATA");
-		// Si la variable de entorno no existe, estamos en Linux
+		// If env doesn't exist, we're in Linux
 		if (env == null || env.isEmpty()) {
-			// En Linux se puede usar XDG_CONFIG_HOME o HOME/.config
+			// In Linux we can use XDG_CONFIG_HOME or HOME/.config
 			String xdg = System.getenv("XDG_CONFIG_HOME");
 			if (xdg != null && !xdg.isEmpty()) {
 				env = xdg;
@@ -93,7 +93,7 @@ public class WebServer {
 		Config.configDir = env + "\\AnyManager";
 		Config.set("Storage.baseDir", env + "\\AnyManager");
 
-		// Guarda en la configuración el sitio donde se ha ejecutado LoginManager por última vez.
+		// Save the last directory it was run on, just in case
 		String userDirectory = new File("").getAbsolutePath();
 		Config.set("System.loginLast", userDirectory);
 
@@ -139,15 +139,15 @@ public class WebServer {
 					logLevelChanged = true;
 				}
 
+				// Modo debug: impide la aparición de consolas, imprime todos los logs
 				case "-d", "--debug" -> {
 					Config.setInt("Logger.logLevel", 0);
 					logLevelChanged = true;
 					debug = true;
 				}
 
-				case "-N", "--no-check" -> {
-					StartupManager.noCheck = true;
-				}
+				// Impide que la comprobación del servicio SQL ocurra. Capa de compatibilidad con Linux
+				case "-N", "--no-check" -> StartupManager.noCheck = true;
 			}
 		}
 
@@ -170,8 +170,8 @@ public class WebServer {
                                     d8888P                                                       d8888P                   \s""");
 		System.out.println("\n                            Un programa creado por RocketSmash9000\n");
 
-		//* Configurar el apagado limpio
-		//* En caso de necesitar devolver algo a su estado original, usar este bloque
+		//* Configure clean shutdown
+		//* In case of needing to return any non-volatile variable to its original state, do so here
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			if (logLevelChanged) {
 				Logger.debug("Devolviendo el nivel de log al original...");
@@ -187,10 +187,10 @@ public class WebServer {
 		int resultado = Conexión.creaDB();
 		switch (resultado){
 			case 0:
-				// no ha habido ningún error y la tabla ya está creada.
+				// No errors
 				break;
 			case 1:
-				// La tabla no estaba creada ni la base de datos.
+				// Either the table or the whole database don't exist.
 				Conexión.creaDB();
 			default:
 				break;
@@ -198,7 +198,7 @@ public class WebServer {
 
 		// Configure Spark
 		// Set secure keystore
-		String keystorePath = WebServer.class.getClassLoader().getResource("security/keystore.p12").getPath();
+		String keystorePath = Objects.requireNonNull(WebServer.class.getClassLoader().getResource("security/keystore.p12")).getPath();
 		keystorePath = keystorePath.replaceFirst("^/(.:/)", "$1"); // Fix Windows path issue
 		
 		// Configure HTTPS
@@ -210,8 +210,6 @@ public class WebServer {
 		staticFiles.location("/public"); // Serve static files from resources/public
 		staticFiles.expireTime(600); // Cache static files for 10 minutes
 
-		// Configure HTTP to HTTPS redirect on port 80
-		// port(80);
 		before((request, response) -> {
 		    if (request.scheme().equals("http")) {
 		        response.redirect("https://" + request.host().replaceFirst(":\\d+", "") + ":2048" + request.pathInfo(), 301);
@@ -326,7 +324,7 @@ public class WebServer {
 							res.status(500);
 							return "Error al registrar el nuevo usuario";
 						}
-						// Después de registrar un nuevo usuario, no intentamos registrar entrada/salida
+						// After registering a new user, we don't register their entrance/exit
 						return "Usuario registrado exitosamente. Por favor, inicie sesión nuevamente para registrar su entrada/salida.";
 					case 3:
 						res.status(500);
@@ -358,7 +356,7 @@ public class WebServer {
 			return "{\"isNewUser\":" + isNewUser + "}";
 		});
 
-		// API endpoint to get user records
+		// Endpoint to get user records
 		get("/api/mis-registros", (req, res) -> {
 			String dni = req.queryParams("dni");
 			String password = req.queryParams("password");

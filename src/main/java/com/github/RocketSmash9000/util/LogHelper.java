@@ -31,7 +31,7 @@ public class LogHelper {
 				// Sort files by last modified date (oldest first)
 				Arrays.sort(logFiles, Comparator.comparingLong(File::lastModified));
 
-				// Delete oldest files until we're under the limit
+				// Delete older files until we're under the limit
 				int filesToDelete = logFiles.length - maxLogs;
 				for (int i = 0; i < filesToDelete; i++) {
 					try {

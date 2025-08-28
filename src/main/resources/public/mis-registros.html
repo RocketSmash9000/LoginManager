@@ -195,6 +195,43 @@
             font-style: italic;
         }
 
+        /* Password toggle button styles */
+        .password-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .password-input-container input[type="password"],
+        .password-input-container input[type="text"] {
+            width: 100%;
+            padding-right: 40px;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 8px;
+            top: 13px;
+            height: 50%;
+            width: 32px;
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s, background-color 0.2s;
+        }
+        
+        .toggle-password:hover {
+            color: var(--primary-color);
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
         .footer {
             margin-top: 2rem;
             text-align: center;
@@ -229,6 +266,7 @@
     </style>
     <link rel="icon" href="/icon.png" type="image/x-icon">
     <link rel="shortcut icon" href="/icon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -248,12 +286,18 @@
         </div>
         <div class="form-group">
             <label for="password">Contraseña</label>
-            <input
-                type="password"
-                id="password"
-                placeholder="Introduce tu contraseña"
-                minlength="6"
-                required>
+            <div class="password-input-container">
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Introduce tu contraseña"
+                    minlength="6"
+                    required>
+                <button type="button" id="togglePassword" class="toggle-password" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+                    <span class="material-icons">visibility</span>
+                </button>
+            </div>
         </div>
         <div class="button-container">
             <button class="btn btn-primary" onclick="login()">Ver mis registros</button>
@@ -302,6 +346,37 @@
 </div>
 
     <script>
+        // Password toggle functionality
+        function setupPasswordToggle(buttonId, inputId) {
+            const toggleButton = document.querySelector(buttonId);
+            const input = document.getElementById(inputId);
+            
+            if (!toggleButton || !input) return;
+            
+            toggleButton.addEventListener('click', function() {
+                // Toggle the type attribute
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                
+                // Toggle the icon and tooltip
+                const icon = this.querySelector('.material-icons');
+                if (type === 'password') {
+                    icon.textContent = 'visibility';
+                    this.setAttribute('title', 'Mostrar contraseña');
+                    this.setAttribute('aria-label', 'Mostrar contraseña');
+                } else {
+                    icon.textContent = 'visibility_off';
+                    this.setAttribute('title', 'Ocultar contraseña');
+                    this.setAttribute('aria-label', 'Ocultar contraseña');
+                }
+            });
+        }
+        
+        // Initialize password toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            setupPasswordToggle('#togglePassword', 'password');
+        });
+
         function login() {
             const dni = document.getElementById('dni').value.trim().toUpperCase();
             const password = document.getElementById('password').value.trim();

@@ -11,9 +11,9 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
- * Clase genérica para manejar la configuración de la aplicación.
- * Proporciona métodos estáticos para leer y escribir propiedades de configuración
- * en un archivo ubicado en el directorio de configuración del usuario.
+ * Generic class to handle application configuration.
+ * Provides static methods to read and write configuration properties
+ * in a file located in the user's configuration directory.
  */
 public class Config {
     public static String configDir;
@@ -22,7 +22,7 @@ public class Config {
     private static volatile boolean configuracionCargada = false;
     private static final Object lock = new Object();
 
-    // Inicialización perezosa
+    // Lazy initialization
     private static void asegurarConfiguracionCargada() {
         if (!configuracionCargada) {
             synchronized (lock) {
@@ -35,14 +35,14 @@ public class Config {
     }
 
     /**
-     * Carga la configuración desde el archivo, o crea uno vacío si no existe.
+     * Loads the configuration from the file, or creates an empty one if it doesn't exist.
      */
     private static void cargarConfiguracion() {
         configFile = configDir + "\\user.cfg";
 		File configFile = new File(Config.configFile);
 
         try {
-            // Crear directorio si no existe
+            // Create directory if it doesn't exist
             Files.createDirectories(Paths.get(configDir));
 
             if (configFile.exists()) {
@@ -51,7 +51,7 @@ public class Config {
                     //Logger.debug("Configuración cargada correctamente desde " + CONFIG_FILE);
                 }
             } else {
-                // Guardar archivo de configuración vacío
+                // Save empty configuration file
                 guardarConfiguracion();
                 //Logger.debug("Archivo de configuración creado en " + CONFIG_FILE);
             }
@@ -61,7 +61,7 @@ public class Config {
     }
 
     /**
-     * Guarda la configuración actual en el archivo.
+     * Saves the current configuration to the file.
      */
     private static void guardarConfiguracion() {
         try (FileOutputStream fos = new FileOutputStream(configFile)) {
@@ -73,12 +73,12 @@ public class Config {
     }
 
     /**
-     * Obtiene un valor de configuración como String.
-     * Si la clave no existe, guarda el valor por defecto en la configuración.
+     * Gets a configuration value as a String.
+     * If the key doesn't exist, saves the default value to the configuration.
      * 
-     * @param key La clave de la propiedad
-     * @param defaultValue Valor por defecto si la propiedad no existe
-     * @return El valor de la propiedad o el valor por defecto
+     * @param key The property key
+     * @param defaultValue Default value if the property doesn't exist
+     * @return The property value or the default value
      */
     public static String getString(String key, String defaultValue) {
         asegurarConfiguracionCargada();
@@ -86,7 +86,7 @@ public class Config {
         // Si la clave no existe, guardar el valor por defecto
         if (!props.containsKey(key) && defaultValue != null) {
             props.setProperty(key, defaultValue);
-            // Usar un nuevo hilo para guardar y no bloquear
+            // Use a new thread to save and avoid blocking
             new Thread(Config::guardarConfiguracion, "Config-Save-Thread").start();
         }
         
@@ -94,40 +94,40 @@ public class Config {
     }
 
     /**
-     * Obtiene un valor de configuración como entero.
-     * Si la clave no existe, guarda el valor por defecto en la configuración.
+     * Gets a configuration value as an integer.
+     * If the key doesn't exist, saves the default value to the configuration.
      * 
-     * @param key La clave de la propiedad
-     * @param defaultValue Valor por defecto si la propiedad no existe o no es un entero válido
-     * @return El valor de la propiedad como entero o el valor por defecto
+     * @param key The property key
+     * @param defaultValue Default value if the property doesn't exist or is not a valid integer
+     * @return The property value as an integer or the default value
      */
     public static int getInt(String key, int defaultValue) {
         asegurarConfiguracionCargada();
         String stringValue = props.getProperty(key);
         
-        // Si la clave no existe, guardar el valor por defecto
+        // If the key does not exist, save the default value
         if (stringValue == null) {
             setInt(key, defaultValue);
             return defaultValue;
         }
         
-        // Si la clave existe pero el valor no es un número, intentar convertirlo
+        // If the key exists but the value is not a number, try to convert it
         try {
             return Integer.parseInt(stringValue);
         } catch (NumberFormatException e) {
-            Logger.error(String.format("Valor no válido para la propiedad '%s': %s. Usando valor por defecto: %d", 
+            Logger.error(String.format("Invalid value for property '%s': %s. Using default value: %d", 
                 key, stringValue, defaultValue));
-            // Corregir el valor inválido con el valor por defecto
+            // Fix the invalid value with the default value
             setInt(key, defaultValue);
             return defaultValue;
         }
     }
 
     /**
-     * Establece un valor de configuración.
+     * Sets a configuration value.
      *
-     * @param key La clave de la propiedad
-     * @param value El valor a establecer
+     * @param key The property key
+     * @param value The value to set
      */
     public static void set(String key, String value) {
         asegurarConfiguracionCargada();
@@ -137,26 +137,26 @@ public class Config {
         } else {
             props.setProperty(key, value);
         }
-        // Solo guardar si el valor ha cambiado
+        // Only save if the value has changed
         if (oldValue == null || !oldValue.equals(value)) {
             guardarConfiguracion();
         }
     }
 
     /**
-     * Establece un valor de configuración entero.
+     * Sets an integer configuration value.
      *
-     * @param key La clave de la propiedad
-     * @param value El valor entero a establecer
+     * @param key The property key
+     * @param value The integer value to set
      */
     public static void setInt(String key, int value) {
         set(key, String.valueOf(value));
     }
 
     /**
-     * Elimina una propiedad de configuración.
+     * Removes a configuration property.
      *
-     * @param key La clave de la propiedad a eliminar
+     * @param key The key of the property to remove
      */
     public static void remove(String key) {
         asegurarConfiguracionCargada();
@@ -167,7 +167,7 @@ public class Config {
     }
 
     /**
-     * Limpia toda la configuración.
+     * Clears all configuration.
      */
     public static void clear() {
         asegurarConfiguracionCargada();

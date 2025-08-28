@@ -12,6 +12,20 @@ import org.json.simple.JSONObject;
 import static java.sql.DriverManager.getConnection;
 
 public class Conexión {
+	/**
+	 * Will do one of these things in order:
+	 * <ol>
+	 *     <li> Connects to the database.
+	 *     <li> Try to create tables if they don't exist already.
+	 *     <li> If it can't connect to the database, it will try to connect to MySQL.
+	 *     <li> If it connects, it will create the database.
+	 * </ol>
+	 * @return <ul>
+	 *     <li> 0 if it connected to the database and the tables were created (or if they already existed)
+	 *     <li> 1 if the database doesn't exist, but was created successfully.
+	 *     <li> 2 if an error occurred.
+	 * </ul>
+	 */
 	public static int creaDB() {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -77,18 +91,29 @@ public class Conexión {
 		}
 	}
 
+	/**
+	 * Adds a new entrance registry for the specified user.
+	 * <pre></pre>
+	 * Will check other registries for exists without entrance first, and update them if they exist.
+	 * @param dni the DNI of the user.
+	 * @param observaciones any observations/notes of the user if needed.
+	 * @return <ul>
+	 *     <li> 0 if no errors occurred.
+	 *     <li> 1 if errors were encountered during the process.
+	 * </ul>
+	 */
 	public static int insertarEntrada(String dni, String observaciones) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			try (Connection conn = getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass)) {
-				// Verificar si hay un registro del día actual con solo hora de salida
+				// Verify if there's a registry with an exit without an entrance
 				boolean registroActualizado = false;
 				try (ResultSet rs = obtenerUltimoRegistroHoy(conn, dni)) {
 					if (rs.next()) {
 						Time horaSalida = rs.getTime("hora_salida");
 						Time horaEntrada = rs.getTime("hora_entrada");
 						
-						// Si hay un registro con hora de salida pero sin hora de entrada, actualizamos
+						// If there is one, update the registry to add the entrance to that.
 						if (horaSalida != null && horaEntrada == null) {
 							String sql = "UPDATE RegistroHorario SET hora_entrada = ? WHERE id = ?";
 							try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -101,7 +126,7 @@ public class Conexión {
 					}
 				}
 				
-				// Si no se actualizó ningún registro, creamos uno nuevo
+				// If no registry was updated, create a new one.
 				if (!registroActualizado) {
 					String sql = "INSERT INTO RegistroHorario (dni, fecha, hora_entrada, observaciones) VALUES (?, CURDATE(), ?, ?)";
 					try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -112,7 +137,7 @@ public class Conexión {
 					}
 				}
 
-				// Actualizar el estado del empleado a activo
+				// Update the employee to be active.
 				String sql = "UPDATE Empleados SET activo = TRUE WHERE dni = ?";
 				try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 					stmt.setString(1, dni);
@@ -131,21 +156,32 @@ public class Conexión {
 			return 1;
 		}
 		Logger.info("La entrada de la persona con DNI " + dni + " ha sido registrada.");
-		return 0; // Devuelve 0 si no ha habido ningún error
+		return 0;
 	}
 
+	/**
+	 * Adds a new exit registry for the specified user.
+	 * <pre></pre>
+	 * Will check other registries for exists without exit first, and update them if they exist.
+	 * @param dni the DNI of the user.
+	 * @param observaciones any observations/notes of the user if needed.
+	 * @return <ul>
+	 *     <li> 0 if no errors occurred.
+	 *     <li> 1 if errors were encountered during the process.
+	 * </ul>
+	 */
 	public static int insertarSalida(String dni, String observaciones) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			try (Connection conn = getConnection("jdbc:mysql://localhost/LOGINS", StartupManager.username, StartupManager.pass)) {
-				// Verificar si hay un registro del día actual con solo hora de entrada
+				// Verify if there's a registry with only an entrance
 				boolean registroActualizado = false;
 				try (ResultSet rs = obtenerUltimoRegistroHoy(conn, dni)) {
 					if (rs.next()) {
 						Time horaEntrada = rs.getTime("hora_entrada");
 						Time horaSalida = rs.getTime("hora_salida");
 						
-						// Si hay un registro con hora de entrada pero sin hora de salida, actualizamos
+						// If there's one, update it
 						if (horaEntrada != null && horaSalida == null) {
 							String sql = "UPDATE RegistroHorario SET hora_salida = ?, observaciones = ? WHERE id = ?";
 							try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -159,7 +195,7 @@ public class Conexión {
 					}
 				}
 				
-				// Si no se actualizó ningún registro, creamos uno nuevo
+				// If no registry was updated, create a new one
 				if (!registroActualizado) {
 					String sql = "INSERT INTO RegistroHorario (dni, fecha, hora_salida, observaciones) VALUES (?, CURDATE(), ?, ?)";
 					try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -170,7 +206,7 @@ public class Conexión {
 					}
 				}
 
-				// Actualizar el estado del empleado a inactivo
+				// Update employee's state to inactive
 				String sql = "UPDATE Empleados SET activo = FALSE WHERE dni = ?";
 				try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 					stmt.setString(1, dni);
@@ -189,9 +225,15 @@ public class Conexión {
 			return 1;
 		}
 		Logger.info("La salida de la persona con DNI " + dni + " ha sido registrada.");
-		return 0; // Devuelve 0 si no ha habido ningún error
+		return 0;
 	}
 
+	/**
+	 * Obtains all the registries of a given user.
+	 * @Warn Might lag if there are hundreds or thousands of registries.
+	 * @param dni DNI of the user.
+	 * @return all registries of the user with a given DNI.
+	 */
 	public static String obtenerRegistrosUsuario(String dni) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -245,10 +287,10 @@ public class Conexión {
 	}
 	
 	/**
-	 * Obtiene el último registro de un usuario para la fecha actual
-	 * @param dni El DNI del usuario
-	 * @return Un ResultSet con el último registro del día actual, o null si no hay registros
-	 * @throws SQLException Si ocurre un error al consultar la base de datos
+	 * Obtains the latest registry of the current day of a user.
+	 * @param dni user's DNI.
+	 * @return a ResultSet with the last register of the current day, or null if there's none.
+	 * @throws SQLException if there's an error with the database.
 	 */
 	private static ResultSet obtenerUltimoRegistroHoy(Connection conn, String dni) throws SQLException {
 		String sql = "SELECT * FROM RegistroHorario " +

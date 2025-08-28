@@ -35,8 +35,14 @@ public class StartupManager {
 
 		return file.exists();
 	}
+
+	/**
+	 * If it's the first time running LoginManager, prompt for the username and password for MySQL.
+	 * <pre></pre>
+	 * Stores them in a file, then encrypts it for safe storage
+	 */
 	public static void firstStartup() {
-		if (!mySQLStartup())
+		if (mySQLStartup())
 			exit(1);
 
 		System.out.println("Hola! Si estás viendo esto es porque esta es la primera vez que inicias el programa.");
@@ -91,10 +97,14 @@ public class StartupManager {
 		}
 	} // The Scanner is automatically closed here by the try-with-resources statement
 
+	/**
+	 * Decrypts and reads the username and password for SQL.
+	 * First calls {@code mySQLStartup()} to check if MySQL is running.
+	 */
 	public static void startup() {
 		folderName = Config.configDir;
 
-		if (!mySQLStartup())
+		if (mySQLStartup())
 			exit(1);
 		if (credFileExists()) {
 
@@ -127,12 +137,14 @@ public class StartupManager {
 	/**
 	 * Checks if the MySQL service is running and starts it if it's not.
      * This method requires administrator privileges to start the service.
-     * @return true if the service is running or was successfully started, false otherwise
+     * @return true if the service is running or was successfully started, false otherwise.
+	 * If {@code noCheck} is true, returns true even if it's not running.
      */
+	@SuppressWarnings("D")
     public static boolean mySQLStartup() {
 		if (noCheck) {
 			Logger.info("No vamos a comprobar si MySQL funciona. Pueden ocurrir errores.");
-			return true;
+			return false;
 		}
         try {
             // Check if the service is already running
@@ -144,7 +156,7 @@ public class StartupManager {
             
             if (output.contains("RUNNING")) {
                 Logger.debug("MySQL ya está funcionando.");
-                return true;
+                return false;
             } else if (output.contains("STOPPED")) {
                 Logger.info("MySQL está parado. Vamos a intentar iniciarlo...");
                 
@@ -154,20 +166,20 @@ public class StartupManager {
                 
                 if (exitCode == 0) {
                     Logger.info("MySQL se pudo ejecutar exitosamente.");
-                    return true;
+                    return false;
                 } else {
                     String error = new String(startProcess.getErrorStream().readAllBytes());
                     Logger.error("No se pudo iniciar MySQL. Código de salida: " + exitCode);
                     Logger.error("Error: " + error);
 					Logger.info("Por favor, inicia MySQL manualmente o contacta con el autor.");
-                    return false;
+                    return true;
                 }
             } else if (output.contains("FAILED 1060")) {
                 Logger.warn("MySQL no está instalado o el nombre del servicio es incorrecto.");
 				Logger.info("Vamos a probar con otro nombre");
 
 				MYSQL_SERVICE_NAME = "MySQL80";
-				// A veces MySQL está instalado como MySQL80, así que comprobamos eso también por si acaso
+				// Sometimes MySQL is installed as MySQL80, so let's check if that's the case
 	            try {
 		            // Check if the service is already running
 		            checkProcess = Runtime.getRuntime().exec("sc query " + MYSQL_SERVICE_NAME);
@@ -178,7 +190,7 @@ public class StartupManager {
 
 		            if (output.contains("RUNNING")) {
 			            Logger.debug("MySQL ya está funcionando.");
-			            return true;
+			            return false;
 		            } else if (output.contains("STOPPED")) {
 			            Logger.info("MySQL está parado. Vamos a intentar iniciarlo...");
 
@@ -188,22 +200,22 @@ public class StartupManager {
 
 			            if (exitCode == 0) {
 				            Logger.info("MySQL se pudo ejecutar exitosamente.");
-				            return true;
+				            return false;
 			            } else {
 				            String error = new String(startProcess.getErrorStream().readAllBytes());
 				            Logger.error("No se pudo iniciar MySQL. Código de salida: " + exitCode);
 				            Logger.error("Error: " + error);
 				            Logger.info("Por favor, inicia MySQL manualmente o contacta con el autor.");
-				            return false;
+				            return true;
 			            }
 		            } else if (output.contains("FAILED 1060")) {
 			            Logger.warn("MySQL no está instalado o el nombre del servicio es incorrecto.");
 			            Logger.info("Por favor, inicia MySQL manualmente si está instalado o contacta con el autor.");
-			            return false;
+			            return true;
 		            } else {
 			            Logger.error("Ha ocurrido un problema inesperado: " + output);
 			            Logger.info("Contacta con el autor para resolver el problema.");
-			            return false;
+			            return true;
 		            }
 	            } catch (IOException | InterruptedException e) {
 		            Logger.error("Hubo un error al comprobar el mensaje de retorno: " + e.getMessage());
@@ -212,12 +224,12 @@ public class StartupManager {
 		            if (e instanceof InterruptedException) {
 			            Thread.currentThread().interrupt();
 		            }
-		            return false;
+		            return true;
 	            }
             } else {
                 Logger.error("Ha ocurrido un problema inesperado: " + output);
 	            Logger.info("Contacta con el autor para resolver el problema.");
-                return false;
+                return true;
             }
         } catch (IOException | InterruptedException e) {
             Logger.error("Hubo un error al comprobar el mensaje de retorno: " + e.getMessage());
@@ -226,7 +238,7 @@ public class StartupManager {
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }
-            return false;
+            return true;
         }
     }
 }
