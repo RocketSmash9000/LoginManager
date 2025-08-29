@@ -48,6 +48,23 @@ public class Conexión {
 					"activo BOOLEAN NOT NULL DEFAULT TRUE)";
 			stm.executeUpdate(sql);
 
+			// Create password reset requests table
+			stm = co.createStatement();
+			sql = "CREATE TABLE IF NOT EXISTS PasswordResetRequests (" +
+					"id VARCHAR(36) PRIMARY KEY, " +
+					"dni VARCHAR(9) NOT NULL, " +
+					"request_time DATETIME NOT NULL, " +
+					"status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'PENDING', " +
+					"encrypted_password_path VARCHAR(255) NOT NULL, " +
+					"processed_time DATETIME, " +
+					"processed_by VARCHAR(100), " +
+					"FOREIGN KEY (dni) REFERENCES Empleados(dni) ON DELETE CASCADE, " +
+					"INDEX idx_dni (dni), " +
+					"INDEX idx_status (status), " +
+					"INDEX idx_request_time (request_time)" +
+					")";
+			stm.executeUpdate(sql);
+
 
 			Logger.info("Nos hemos conectado a la base de datos.");
 			return 0;

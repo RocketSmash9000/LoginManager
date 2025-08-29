@@ -2,11 +2,14 @@ package com.github.RocketSmash9000; // Make sure you have the correct package de
 
 import com.github.RocketSmash9000.config.Config;
 import com.github.RocketSmash9000.util.Logger;
+import com.github.RocketSmash9000.util.PasswordResetManager;
+import com.github.RocketSmash9000.util.PasswordStorage;
 import org.fusesource.jansi.AnsiConsole;
 
 import java.io.Console;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -112,7 +115,7 @@ public class WebServer {
 							-a, --all      -> Muestra toda la información posible al ejecutar QueryManager.
 							-n, -none      -> Solo muestra errores fatales en la consola al ejecutar.
 							-h, --help     -> Muestra esto en la consola.
-							-d, --debug    -> Cambia el nivel de logs a DEBUG e impide la aparición de consolas. Sin uso fuera de un IDE
+							-d, --debug    -> Hace lo mismo que -a y -N e impide la aparición de consolas. Sin uso fuera de un IDE
 							-N, --no-check -> No comprueba si MySQL está funcionando. Útil como capa de compatibilidad con Linux.
 							
 							Dejar opciones en blanco para ejecutar en modo normal.
@@ -144,6 +147,7 @@ public class WebServer {
 					Config.setInt("Logger.logLevel", 0);
 					logLevelChanged = true;
 					debug = true;
+					StartupManager.noCheck = true;
 				}
 
 				// Impide que la comprobación del servicio SQL ocurra. Capa de compatibilidad con Linux
@@ -377,6 +381,43 @@ public class WebServer {
 			String records = Conexión.obtenerRegistrosUsuario(dni);
 			res.type("application/json");
 			return records;
+		});
+
+		// Endpoint to request a password reset
+		post("/api/password-reset/request", (req, res) -> {
+			try {
+				String dni = req.queryParams("dni");
+				String newPassword = req.queryParams("newPassword");
+
+				if (dni == null || dni.trim().isEmpty() || newPassword == null || newPassword.trim().isEmpty()) {
+					res.status(400);
+					return "{\"error\":\"Se requieren DNI y nueva contraseña\"}";
+				}
+
+				if (!Checker.validDNI(dni)) {
+					res.status(400);
+					return "{\"error\":\"DNI no válido\"}";
+				}
+
+				// Create password reset request
+				String requestId = PasswordResetManager.createPasswordResetRequest(dni.trim(), newPassword.trim());
+				
+				if (requestId != null) {
+					res.status(201);
+					return String.format("{\"requestId\":\"%s\", \"message\":\"Solicitud de restablecimiento de contraseña creada. Un administrador la revisará pronto.\"}", requestId);
+				} else {
+					res.status(500);
+					return "{\"error\":\"No se pudo crear la solicitud de restablecimiento de contraseña\"}";
+				}
+
+			} catch (IllegalStateException e) {
+				res.status(503);
+				return String.format("{\"error\":\"%s\"}", e.getMessage());
+			} catch (Exception e) {
+				Logger.error("Error en la solicitud de restablecimiento de contraseña: " + e.getMessage());
+				res.status(500);
+				return "{\"error\":\"Error interno del servidor\"}";
+			}
 		});
 	}
 }
