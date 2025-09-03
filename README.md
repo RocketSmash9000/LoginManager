@@ -47,6 +47,8 @@ En caso de necesitar funciones específicas que LoginManager o QueryManager no o
 ## Build From Source
 Para construir la aplicación a partir del código fuente es necesario Maven.
 
+Por motivos de seguridad, la librería de cifrado no se incluye en el código fuente. Esto significa que para construir la aplicación hay que modificarla para que no intente cifrar/descifrar ningún archivo.
+
 Antes de crear el archivo JAR, es necesario crear una clave SSL para habilitar HTTPS. Crea un nuevo directorio llamado `security` en `src/main/resources`. Una vez creado, usa los siguientes comandos (desde el directorio raíz):
 
 ```
